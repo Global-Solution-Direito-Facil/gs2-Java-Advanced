@@ -8,5 +8,5 @@ public record LoginResponse(
         String tipo,
         String expiraEm,
         Role role,
-        Long perfilId
+        Long usuarioId
 ) {}

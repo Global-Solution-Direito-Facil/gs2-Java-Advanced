@@ -1,26 +1,17 @@
 package br.com.fiap.diretofacil.dto.response;
 
-import br.com.fiap.diretofacil.enums.Publico;
-import br.com.fiap.diretofacil.enums.StatusConferencia;
+import br.com.fiap.diretofacil.enums.GrupoAlvo;
+import br.com.fiap.diretofacil.enums.StatusVerificacao;
 
-import java.math.BigDecimal;
-import java.util.Set;
-
-/** Direito do catálogo com textos e critérios. */
+/** Direito do catálogo com o critério aninhado. */
 public record DireitoResponse(
         Long id,
         String codigo,
         String nome,
-        String criterios,
-        String ondePedir,
+        String orgao,
         String baseLegal,
-        String urlBaseLegal,
-        Set<Publico> publicos,
-        BigDecimal rendaPerCapitaMaxSm,
-        Integer idadeMinima,
-        Boolean exigeCadunico,
-        Boolean exigeDeficiencia,
-        Boolean exigeTea,
-        StatusConferencia statusConferencia,
-        Boolean ativo
+        GrupoAlvo grupoAlvo,
+        Integer prazoDias,
+        StatusVerificacao statusVerificacao,
+        CriterioDireitoResponse criterio
 ) {}

@@ -1,6 +1,6 @@
 package br.com.fiap.diretofacil.enums;
 
-/** Papel da conta de login: cidadão atendido ou gestor */
+/** Perfil da conta (coluna PERFIL): cidadão responsável ou gestor (assistente social). */
 public enum Role {
     CIDADAO,
     GESTOR

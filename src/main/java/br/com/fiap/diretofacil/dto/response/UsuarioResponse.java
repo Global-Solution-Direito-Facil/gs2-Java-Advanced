@@ -1,16 +1,15 @@
 package br.com.fiap.diretofacil.dto.response;
 
+import br.com.fiap.diretofacil.enums.Role;
+
 import java.time.LocalDateTime;
 
-/** Perfil completo do gestor com o email da conta. */
-public record GestorResponse(
+/** Conta de login sem a senha. */
+public record UsuarioResponse(
         Long id,
         String nome,
         String cpf,
-        String matricula,
-        String unidade,
-        String telefone,
-        Boolean ativo,
         String email,
+        Role perfil,
         LocalDateTime dataCadastro
 ) {}

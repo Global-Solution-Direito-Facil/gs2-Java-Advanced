@@ -4,19 +4,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/** Perfil completo do cidadão, com idade e renda per capita calculadas e o email da conta. */
-public record CidadaoResponse(
+/** Beneficiário com idade e renda per capita calculadas e o responsável resumido. */
+public record PessoaResponse(
         Long id,
+        UsuarioResumoResponse responsavel,
         String nome,
-        String cpf,
         LocalDate dataNascimento,
         Integer idade,
         BigDecimal rendaFamiliar,
-        Integer qtdPessoasFamilia,
+        Integer qtdMembrosFamilia,
         BigDecimal rendaPerCapita,
-        Boolean cadunico,
-        String municipio,
-        String uf,
-        String email,
         LocalDateTime dataCadastro
 ) {}

@@ -1,9 +1,9 @@
 package br.com.fiap.diretofacil.entity;
 
-import br.com.fiap.diretofacil.config.BooleanToCharacterConverter;
 import br.com.fiap.diretofacil.enums.Role;
+import br.com.fiap.diretofacil.validation.Cpf;
+import br.com.fiap.diretofacil.validation.EmailValido;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -11,64 +11,59 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-/** Conta de login; aponta para o perfil (Cidadao ou Gestor) conforme a role. */
+/**
+ * Conta de login do app, com os dados pessoais de quem loga. O cidadão é o
+ * responsável que cadastra os beneficiários (Pessoa); o gestor não tem pessoas.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "USUARIO")
+@Table(name = "T_DF_USUARIO")
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_USUARIO")
-    @SequenceGenerator(name = "SEQ_USUARIO", sequenceName = "SEQ_USUARIO", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_USUARIO")
     private Long id;
 
     @NotBlank
-    @Email
+    @Size(max = 150)
+    @Column(name = "NOME", nullable = false, length = 150)
+    private String nome;
+
+    @NotBlank
+    @Cpf
+    @Size(max = 14)
+    @Column(name = "CPF", nullable = false, unique = true, length = 14)
+    private String cpf;
+
+    @NotBlank
+    @EmailValido
     @Size(max = 150)
     @Column(name = "EMAIL", nullable = false, unique = true, length = 150)
     private String email;
 
     @NotBlank
-    @Size(max = 100)
-    @Column(name = "SENHA_HASH", nullable = false, length = 100)
-    private String senhaHash;
+    @Size(max = 255)
+    @Column(name = "SENHA", nullable = false, length = 255)
+    private String senha;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "ROLE", nullable = false, length = 20)
-    private Role role;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_CIDADAO", unique = true)
-    private Cidadao cidadao;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_GESTOR", unique = true)
-    private Gestor gestor;
-
-    @NotNull
-    @Builder.Default
-    @Convert(converter = BooleanToCharacterConverter.class)
-    @Column(name = "ATIVO", nullable = false)
-    private Boolean ativo = true;
+    @Column(name = "PERFIL", nullable = false, length = 10)
+    private Role perfil;
 
     @CreationTimestamp
-    @Column(name = "DATA_CADASTRO", nullable = false, updatable = false)
+    @Column(name = "DT_CADASTRO", nullable = false, updatable = false, columnDefinition = "DATE")
     private LocalDateTime dataCadastro;
 
-    public Long getPerfilId() {
-        if (role == Role.CIDADAO && cidadao != null) {
-            return cidadao.getId();
-        }
-        if (role == Role.GESTOR && gestor != null) {
-            return gestor.getId();
-        }
-        return null;
-    }
+    @OneToMany(mappedBy = "usuario")
+    @Builder.Default
+    private List<Pessoa> pessoas = new ArrayList<>();
 }

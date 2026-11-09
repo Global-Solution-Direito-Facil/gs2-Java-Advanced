@@ -1,10 +1,11 @@
 package br.com.fiap.diretofacil.enums;
 
-/** Status do acompanhamento de um caso. */
+/** Status do caso; o fluxo entre eles é validado pela trigger TRG_DF_CASO_VALIDA. */
 public enum StatusCaso {
     ABERTO,
-    EM_ANDAMENTO,
+    EM_ANALISE,
+    DOCUMENTOS_PENDENTES,
+    PROTOCOLADO,
     CONCEDIDO,
-    NEGADO,
-    PARADO
+    NEGADO
 }

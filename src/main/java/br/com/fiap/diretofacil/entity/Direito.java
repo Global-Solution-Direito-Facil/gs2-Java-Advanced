@@ -1,19 +1,14 @@
 package br.com.fiap.diretofacil.entity;
 
-import br.com.fiap.diretofacil.config.BooleanToCharacterConverter;
-import br.com.fiap.diretofacil.enums.Publico;
-import br.com.fiap.diretofacil.enums.StatusConferencia;
+import br.com.fiap.diretofacil.enums.GrupoAlvo;
+import br.com.fiap.diretofacil.enums.StatusVerificacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Direito do catálogo (BPC, Tarifa Social, CIPTEA...), com os textos para o cidadão
- * e os critérios numéricos que a regra de elegibilidade compara.
+ * Direito do catálogo federal (BPC, CIPTEA, Tarifa Social...), com órgão, base
+ * legal e prazo. A regra numérica fica em CriterioDireito.
  */
 @Getter
 @Setter
@@ -21,87 +16,51 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "DIREITO")
+@Table(name = "T_DF_DIREITO")
 public class Direito {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_DIREITO")
-    @SequenceGenerator(name = "SEQ_DIREITO", sequenceName = "SEQ_DIREITO", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_DIREITO")
     private Long id;
 
     @NotBlank
-    @Pattern(regexp = "[A-Z0-9_]{3,50}")
-    @Column(name = "CODIGO", nullable = false, unique = true, length = 50)
+    @Pattern(regexp = "[A-Z0-9_]{3,40}")
+    @Column(name = "COD_DIREITO", nullable = false, unique = true, length = 40)
     private String codigo;
 
     @NotBlank
     @Size(max = 150)
-    @Column(name = "NOME", nullable = false, length = 150)
+    @Column(name = "NOME_DIREITO", nullable = false, length = 150)
     private String nome;
 
     @NotBlank
-    @Size(max = 500)
-    @Column(name = "CRITERIOS", nullable = false, length = 500)
-    private String criterios;
+    @Size(max = 100)
+    @Column(name = "DES_ORGAO", nullable = false, length = 100)
+    private String orgao;
 
     @NotBlank
     @Size(max = 200)
-    @Column(name = "ONDE_PEDIR", nullable = false, length = 200)
-    private String ondePedir;
+    @Column(name = "DES_BASE_LEGAL", nullable = false, length = 200)
+    private String baseLegal;
 
-    @NotBlank
-    @Size(max = 200)
-    @Column(name = "BASE_LEGAL", nullable = false, length = 200)
-    private String baseLegal;   
-
-    @Size(max = 500)
-    @Column(name = "URL_BASE_LEGAL", length = 500)
-    private String urlBaseLegal;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "DIREITO_PUBLICO", joinColumns = @JoinColumn(name = "ID_DIREITO"))
+    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "PUBLICO", nullable = false, length = 20)
-    @Builder.Default
-    private Set<Publico> publicos = new HashSet<>();
-
-    @DecimalMin("0.01")
-    @Column(name = "RENDA_PER_CAPITA_MAX_SM", precision = 5, scale = 2)
-    private BigDecimal rendaPerCapitaMaxSm;
-
-    @Min(0)
-    @Max(120)
-    @Column(name = "IDADE_MINIMA")
-    private Integer idadeMinima;
+    @Column(name = "GRUPO_ALVO", nullable = false, length = 20)
+    private GrupoAlvo grupoAlvo;
 
     @NotNull
+    @Positive
     @Builder.Default
-    @Convert(converter = BooleanToCharacterConverter.class)
-    @Column(name = "EXIGE_CADUNICO", nullable = false)
-    private Boolean exigeCadunico = false;
-
-    @NotNull
-    @Builder.Default
-    @Convert(converter = BooleanToCharacterConverter.class)
-    @Column(name = "EXIGE_DEFICIENCIA", nullable = false)
-    private Boolean exigeDeficiencia = false;
-
-    @NotNull
-    @Builder.Default
-    @Convert(converter = BooleanToCharacterConverter.class)
-    @Column(name = "EXIGE_TEA", nullable = false)
-    private Boolean exigeTea = false;
+    @Column(name = "NUM_PRAZO_DIAS", nullable = false)
+    private Integer prazoDias = 30;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    @Column(name = "STATUS_CONFERENCIA", nullable = false, length = 20)
-    private StatusConferencia statusConferencia = StatusConferencia.CONFIRMAR;
+    @Column(name = "STA_VERIFICACAO", nullable = false, length = 10)
+    private StatusVerificacao statusVerificacao = StatusVerificacao.CONFIRMAR;
 
-    @NotNull
-    @Builder.Default
-    @Convert(converter = BooleanToCharacterConverter.class)
-    @Column(name = "ATIVO", nullable = false)
-    private Boolean ativo = true;
+    @OneToOne(mappedBy = "direito", fetch = FetchType.LAZY)
+    private CriterioDireito criterio;
 }

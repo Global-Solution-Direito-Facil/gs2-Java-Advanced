@@ -1,19 +1,19 @@
 package br.com.fiap.diretofacil.entity;
 
+import br.com.fiap.diretofacil.enums.ResultadoElegibilidade;
 import br.com.fiap.diretofacil.enums.StatusCaso;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Acompanhamento de um pedido: um direito apontado como ELEGIVEL ou POSSIVEL
- * para um cidadão, com o passo a passo gerado pela IA e o status que o gestor movimenta.
+ * Pedido de um direito para uma pessoa, aberto pela PKG_ELEGIBILIDADE quando o
+ * resultado é ELEGIVEL ou POSSIVEL. Status muda só via PKG_CASOS, que respeita
+ * o fluxo validado pela trigger e gera a auditoria.
  */
 @Getter
 @Setter
@@ -21,19 +21,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "CASO")
+@Table(name = "T_DF_CASO")
 public class Caso {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_CASO")
-    @SequenceGenerator(name = "SEQ_CASO", sequenceName = "SEQ_CASO", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_CASO")
     private Long id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_CIDADAO", nullable = false)
-    private Cidadao cidadao;
+    @JoinColumn(name = "ID_PESSOA", nullable = false)
+    private Pessoa pessoa;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -41,40 +40,33 @@ public class Caso {
     private Direito direito;
 
     @NotNull
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_AVALIACAO", nullable = false, unique = true)
-    private AvaliacaoDireito avaliacao;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_GESTOR_RESPONSAVEL")
-    private Gestor gestorResponsavel;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(name = "STATUS", nullable = false, length = 25)
+    private StatusCaso status = StatusCaso.ABERTO;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Builder.Default
-    @Column(name = "STATUS", nullable = false, length = 20)
-    private StatusCaso status = StatusCaso.ABERTO;
+    @Column(name = "RESULTADO_AVALIACAO", nullable = false, length = 15)
+    private ResultadoElegibilidade resultadoAvaliacao;
 
-    @Column(name = "PRAZO")
-    private LocalDate prazo;
+    @NotBlank
+    @Size(max = 300)
+    @Column(name = "DES_MOTIVO", nullable = false, length = 300)
+    private String motivo;
 
-    @Lob
-    @Column(name = "PASSO_A_PASSO")
-    private String passoAPasso;
-
-    @Size(max = 1000)
-    @Column(name = "FONTES", length = 1000)
-    private String fontes;
-
-    @Size(max = 1000)
-    @Column(name = "OBSERVACAO_GESTOR", length = 1000)
-    private String observacaoGestor;
-
-    @CreationTimestamp
-    @Column(name = "DATA_ABERTURA", nullable = false, updatable = false)
+    @NotNull
+    @Column(name = "DT_ABERTURA", nullable = false, columnDefinition = "DATE")
     private LocalDateTime dataAbertura;
 
-    @UpdateTimestamp
-    @Column(name = "DATA_ATUALIZACAO", nullable = false)
+    @NotNull
+    @Column(name = "DT_PRAZO", nullable = false, columnDefinition = "DATE")
+    private LocalDateTime dataPrazo;
+
+    @NotNull
+    @Column(name = "DT_ATUALIZACAO", nullable = false, columnDefinition = "DATE")
     private LocalDateTime dataAtualizacao;
+
+    @OneToOne(mappedBy = "caso", fetch = FetchType.LAZY)
+    private Orientacao orientacao;
 }

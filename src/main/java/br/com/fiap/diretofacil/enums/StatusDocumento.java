@@ -1,9 +1,8 @@
 package br.com.fiap.diretofacil.enums;
 
-/** Ciclo de vida do documento na fila de processamento. */
+/** Situação do documento anunciado pelo evento DocumentoRecebido. */
 public enum StatusDocumento {
     RECEBIDO,
-    PROCESSANDO,
-    EXTRAIDO,
-    FALHA
+    PROCESSADO,
+    ERRO
 }

@@ -7,21 +7,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/** Acesso aos casos, com filtros dinâmicos via Specification. */
 public interface CasoRepository extends JpaRepository<Caso, Long>, JpaSpecificationExecutor<Caso> {
 
-    /** Casos de um cidadão, paginados; é a lista "meus pedidos" do app. */
-    Page<Caso> findByCidadaoId(Long cidadaoId, Pageable pageable);
+    /** Casos de um beneficiário, paginados. */
+    Page<Caso> findByPessoaId(Long pessoaId, Pageable pageable);
+
+    /** Casos de todos os beneficiários de um responsável; é a lista "meus pedidos" do app. */
+    Page<Caso> findByPessoaUsuarioId(Long usuarioId, Pageable pageable);
 
     /** Casos em andamento com prazo dentro do intervalo; alimenta o evento PrazoVencendo. */
-    List<Caso> findByStatusInAndPrazoBetween(List<StatusCaso> status, LocalDate inicio, LocalDate fim);
+    List<Caso> findByStatusInAndDataPrazoBetween(List<StatusCaso> status, LocalDateTime inicio, LocalDateTime fim);
 
     /** Casos em andamento sem atualização desde a data limite; alimenta o evento CasoParado. */
     List<Caso> findByStatusInAndDataAtualizacaoBefore(List<StatusCaso> status, LocalDateTime limite);
 
-    /** Evita abrir dois casos para a mesma avaliação positiva. */
-    boolean existsByAvaliacaoId(Long avaliacaoId);
+    /** Impede apagar um direito que já tem casos abertos. */
+    boolean existsByDireitoId(Long direitoId);
 }

@@ -7,10 +7,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
+/** Acesso aos documentos anunciados pelo evento DocumentoRecebido. */
 public interface DocumentoRepository extends JpaRepository<Documento, Long> {
 
-    /** Detecta reenvio do mesmo upload pelo header Idempotency-Key e devolve o documento já salvo. */
-    Optional<Documento> findByIdempotencyKey(String idempotencyKey);
+    /** Detecta o mesmo evento entregue duas vezes pela fila e devolve o registro já salvo. */
+    Optional<Documento> findByChaveIdempotencia(String chaveIdempotencia);
 
-    Page<Documento> findByCidadaoId(Long cidadaoId, Pageable pageable);
+    /** Localiza o documento pelo id dele na API .NET. */
+    Optional<Documento> findByIdExterno(String idExterno);
+
+    /** Documentos de um beneficiário, paginados. */
+    Page<Documento> findByPessoaId(Long pessoaId, Pageable pageable);
+
+    /** Documentos de todos os beneficiários de um responsável, para o cidadão ver os seus. */
+    Page<Documento> findByPessoaUsuarioId(Long usuarioId, Pageable pageable);
 }

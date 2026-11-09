@@ -1,12 +1,13 @@
 package br.com.fiap.diretofacil.dto.request;
 
-import br.com.fiap.diretofacil.enums.TipoDocumento;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
-/** Metadados do upload em POST /documentos; o arquivo vai como multipart ao lado. */
+/** Registro de um documento recebido; o arquivo fica na API .NET, aqui só os metadados. */
 public record DocumentoRequest(
-        @NotNull TipoDocumento tipo,
-        @NotBlank @Size(max = 100) String idempotencyKey
+        @NotNull Long pessoaId,
+        @NotBlank @Size(max = 100) String idExterno,
+        @NotBlank @Size(max = 200) String nomeArquivo,
+        @NotBlank @Size(max = 50) String tipoMidia,
+        @NotNull @Positive Long tamanhoBytes,
+        @NotBlank @Size(max = 100) String chaveIdempotencia
 ) {}

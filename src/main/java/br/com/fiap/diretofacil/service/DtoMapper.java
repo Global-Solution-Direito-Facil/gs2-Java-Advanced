@@ -3,61 +3,61 @@ package br.com.fiap.diretofacil.service;
 import br.com.fiap.diretofacil.dto.response.*;
 import br.com.fiap.diretofacil.entity.*;
 
+/** Converte entidades nos records de resposta da API. */
 public final class DtoMapper {
 
     private DtoMapper() {}
 
-    public static CidadaoResponse toResponse(Cidadao cidadao, String email) {
-        return new CidadaoResponse(
-                cidadao.getId(),
-                cidadao.getNome(),
-                cidadao.getCpf(),
-                cidadao.getDataNascimento(),
-                cidadao.getIdade(),
-                cidadao.getRendaFamiliar(),
-                cidadao.getQtdPessoasFamilia(),
-                cidadao.getRendaPerCapita(),
-                cidadao.getCadunico(),
-                cidadao.getMunicipio(),
-                cidadao.getUf(),
-                email,
-                cidadao.getDataCadastro()
+    public static UsuarioResponse toResponse(Usuario usuario) {
+        return new UsuarioResponse(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getCpf(),
+                usuario.getEmail(),
+                usuario.getPerfil(),
+                usuario.getDataCadastro()
         );
     }
 
-    public static CidadaoResumoResponse toResumo(Cidadao cidadao) {
-        if (cidadao == null) {
+    public static UsuarioResumoResponse toResumo(Usuario usuario) {
+        if (usuario == null) {
             return null;
         }
-        return new CidadaoResumoResponse(
-                cidadao.getId(),
-                cidadao.getNome(),
-                cidadao.getCpf()
+        return new UsuarioResumoResponse(usuario.getId(), usuario.getNome(), usuario.getEmail());
+    }
+
+    public static PessoaResponse toResponse(Pessoa pessoa) {
+        return new PessoaResponse(
+                pessoa.getId(),
+                toResumo(pessoa.getUsuario()),
+                pessoa.getNome(),
+                pessoa.getDataNascimento(),
+                pessoa.getIdade(),
+                pessoa.getRendaFamiliar(),
+                pessoa.getQtdMembrosFamilia(),
+                pessoa.getRendaPerCapita(),
+                pessoa.getDataCadastro()
         );
     }
 
-    public static GestorResponse toResponse(Gestor gestor, String email) {
-        return new GestorResponse(
-                gestor.getId(),
-                gestor.getNome(),
-                gestor.getCpf(),
-                gestor.getMatricula(),
-                gestor.getUnidade(),
-                gestor.getTelefone(),
-                gestor.getAtivo(),
-                email,
-                gestor.getDataCadastro()
-        );
-    }
-
-    public static GestorResumoResponse toResumo(Gestor gestor) {
-        if (gestor == null) {
+    public static PessoaResumoResponse toResumo(Pessoa pessoa) {
+        if (pessoa == null) {
             return null;
         }
-        return new GestorResumoResponse(
-                gestor.getId(),
-                gestor.getNome(),
-                gestor.getUnidade()
+        return new PessoaResumoResponse(pessoa.getId(), pessoa.getNome());
+    }
+
+    public static CriterioDireitoResponse toResponse(CriterioDireito criterio) {
+        if (criterio == null) {
+            return null;
+        }
+        return new CriterioDireitoResponse(
+                criterio.getIdadeMin(),
+                criterio.getIdadeMax(),
+                criterio.getExigePcd(),
+                criterio.getExigeTea(),
+                criterio.getFracaoSmMax(),
+                criterio.getPctTolerancia()
         );
     }
 
@@ -66,18 +66,12 @@ public final class DtoMapper {
                 direito.getId(),
                 direito.getCodigo(),
                 direito.getNome(),
-                direito.getCriterios(),
-                direito.getOndePedir(),
+                direito.getOrgao(),
                 direito.getBaseLegal(),
-                direito.getUrlBaseLegal(),
-                direito.getPublicos(),
-                direito.getRendaPerCapitaMaxSm(),
-                direito.getIdadeMinima(),
-                direito.getExigeCadunico(),
-                direito.getExigeDeficiencia(),
-                direito.getExigeTea(),
-                direito.getStatusConferencia(),
-                direito.getAtivo()
+                direito.getGrupoAlvo(),
+                direito.getPrazoDias(),
+                direito.getStatusVerificacao(),
+                toResponse(direito.getCriterio())
         );
     }
 
@@ -88,51 +82,72 @@ public final class DtoMapper {
         return new DireitoResumoResponse(
                 direito.getId(),
                 direito.getCodigo(),
-                direito.getNome()
+                direito.getNome(),
+                direito.getOrgao(),
+                direito.getBaseLegal()
         );
     }
 
     public static DocumentoResponse toResponse(Documento documento) {
         return new DocumentoResponse(
                 documento.getId(),
-                toResumo(documento.getCidadao()),
-                documento.getTipo(),
+                toResumo(documento.getPessoa()),
+                documento.getIdExterno(),
                 documento.getNomeArquivo(),
-                documento.getContentType(),
+                documento.getTipoMidia(),
+                documento.getTamanhoBytes(),
                 documento.getStatus(),
-                documento.getCondicao(),
-                documento.getCid(),
-                documento.getIdadeExtraida(),
-                documento.getConfiancaExtracao(),
-                documento.getMensagemErro(),
-                documento.getDataEnvio(),
+                documento.getDataRecebimento(),
                 documento.getDataProcessamento()
         );
     }
 
-    public static AvaliacaoDireitoResponse toResponse(AvaliacaoDireito avaliacao) {
-        return new AvaliacaoDireitoResponse(
-                avaliacao.getId(),
-                toResumo(avaliacao.getDireito()),
-                avaliacao.getResultado(),
-                avaliacao.getMotivo(),
-                avaliacao.getDataAvaliacao()
+    public static LaudoResponse toResponse(Laudo laudo) {
+        return new LaudoResponse(
+                laudo.getId(),
+                toResumo(laudo.getPessoa()),
+                laudo.getDocumento() != null ? laudo.getDocumento().getId() : null,
+                laudo.getCodCid(),
+                laudo.getCondicao(),
+                laudo.getTipoCondicao(),
+                laudo.getDataLaudo(),
+                laudo.getDataCadastro()
+        );
+    }
+
+    public static OrientacaoResponse toResponse(Orientacao orientacao) {
+        if (orientacao == null) {
+            return null;
+        }
+        return new OrientacaoResponse(
+                orientacao.getId(),
+                orientacao.getPassoAPasso(),
+                orientacao.getFonte(),
+                orientacao.getModelo(),
+                orientacao.getDataGeracao()
         );
     }
 
     public static CasoResponse toResponse(Caso caso) {
         return new CasoResponse(
                 caso.getId(),
-                toResumo(caso.getCidadao()),
+                toResumo(caso.getPessoa()),
                 toResumo(caso.getDireito()),
-                toResumo(caso.getGestorResponsavel()),
                 caso.getStatus(),
-                caso.getPrazo(),
-                caso.getPassoAPasso(),
-                caso.getFontes(),
-                caso.getObservacaoGestor(),
+                caso.getResultadoAvaliacao(),
+                caso.getMotivo(),
                 caso.getDataAbertura(),
-                caso.getDataAtualizacao()
+                caso.getDataPrazo(),
+                caso.getDataAtualizacao(),
+                toResponse(caso.getOrientacao())
+        );
+    }
+
+    public static SalarioMinimoResponse toResponse(SalarioMinimo salarioMinimo) {
+        return new SalarioMinimoResponse(
+                salarioMinimo.getAnoReferencia(),
+                salarioMinimo.getValor(),
+                salarioMinimo.getFonte()
         );
     }
 }

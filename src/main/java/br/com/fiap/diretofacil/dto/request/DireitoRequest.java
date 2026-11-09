@@ -1,26 +1,18 @@
 package br.com.fiap.diretofacil.dto.request;
 
-import br.com.fiap.diretofacil.enums.Publico;
-import br.com.fiap.diretofacil.enums.StatusConferencia;
+import br.com.fiap.diretofacil.enums.GrupoAlvo;
+import br.com.fiap.diretofacil.enums.StatusVerificacao;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
-import java.math.BigDecimal;
-import java.util.Set;
-
-/** Manutenção de um direito do catálogo em POST e PUT /direitos. */
+/** Manutenção de um direito do catálogo e do seu critério em POST e PUT /direitos. */
 public record DireitoRequest(
-        @NotBlank @Pattern(regexp = "[A-Z0-9_]{3,50}", message = "código em maiúsculas, números e _") String codigo,
+        @NotBlank @Pattern(regexp = "[A-Za-z0-9_]{3,40}", message = "use letras, números e _ (3 a 40)") String codigo,
         @NotBlank @Size(max = 150) String nome,
-        @NotBlank @Size(max = 500) String criterios,
-        @NotBlank @Size(max = 200) String ondePedir,
+        @NotBlank @Size(max = 100) String orgao,
         @NotBlank @Size(max = 200) String baseLegal,
-        @Size(max = 500) String urlBaseLegal,
-        @NotEmpty Set<Publico> publicos,
-        @DecimalMin("0.01") BigDecimal rendaPerCapitaMaxSm,
-        @Min(0) @Max(120) Integer idadeMinima,
-        @NotNull Boolean exigeCadunico,
-        @NotNull Boolean exigeDeficiencia,
-        @NotNull Boolean exigeTea,
-        @NotNull StatusConferencia statusConferencia,
-        Boolean ativo
+        @NotNull GrupoAlvo grupoAlvo,
+        @NotNull @Positive Integer prazoDias,
+        @NotNull StatusVerificacao statusVerificacao,
+        @NotNull @Valid CriterioDireitoRequest criterio
 ) {}

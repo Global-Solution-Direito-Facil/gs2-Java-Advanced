@@ -1,21 +1,20 @@
 package br.com.fiap.diretofacil.dto.response;
 
+import br.com.fiap.diretofacil.enums.ResultadoElegibilidade;
 import br.com.fiap.diretofacil.enums.StatusCaso;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/** Caso de acompanhamento com cidadão, direito, gestor responsável e passo a passo. */
+/** Caso com pessoa, direito, resultado da regra e a orientação quando existir. */
 public record CasoResponse(
         Long id,
-        CidadaoResumoResponse cidadao,
+        PessoaResumoResponse pessoa,
         DireitoResumoResponse direito,
-        GestorResumoResponse gestorResponsavel,
         StatusCaso status,
-        LocalDate prazo,
-        String passoAPasso,
-        String fontes,
-        String observacaoGestor,
+        ResultadoElegibilidade resultadoAvaliacao,
+        String motivo,
         LocalDateTime dataAbertura,
-        LocalDateTime dataAtualizacao
+        LocalDateTime dataPrazo,
+        LocalDateTime dataAtualizacao,
+        OrientacaoResponse orientacao
 ) {}

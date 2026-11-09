@@ -1,6 +1,6 @@
 package br.com.fiap.diretofacil.enums;
 
-/** Veredito da regra de elegibilidade para um direito. */
+/** Veredito da regra PL/SQL; só ELEGIVEL e POSSIVEL viram caso no banco. */
 public enum ResultadoElegibilidade {
     ELEGIVEL,
     POSSIVEL,
