@@ -1,0 +1,34 @@
+package br.com.fiap.diretofacil.controller;
+
+import br.com.fiap.diretofacil.dto.request.LaudoRequest;
+import br.com.fiap.diretofacil.dto.response.LaudoResponse;
+import br.com.fiap.diretofacil.service.LaudoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/laudos")
+@RequiredArgsConstructor
+@Tag(name = "Laudos", description = "Dados estruturados dos laudos; a lista por pessoa fica em /pessoas/{id}/laudos")
+public class LaudoController {
+
+    private final LaudoService service;
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Buscar laudo por ID")
+    public LaudoResponse buscarPorId(@PathVariable Long id) {
+        return service.buscarPorId(id);
+    }
+
+    @PostMapping
+    @Operation(summary = "Registrar laudo",
+            description = "Exclusivo do gestor. Grava o laudo estruturado e dispara a PKG_ELEGIBILIDADE, que abre um caso para cada direito ELEGIVEL ou POSSIVEL da pessoa.")
+    public ResponseEntity<LaudoResponse> registrar(@RequestBody @Valid LaudoRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.registrar(request));
+    }
+}
