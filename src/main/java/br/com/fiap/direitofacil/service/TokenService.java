@@ -27,7 +27,8 @@ public class TokenService {
     public record Token(String valor, Instant expiraEm) {}
 
     public Token gerar(Usuario usuario) {
-        Instant agora = Instant.now();
+        // o JWT guarda iat/exp em segundos; truncar deixa o expiraEm da resposta igual ao do token
+        Instant agora = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         Instant expiraEm = agora.plus(jwt.expiracaoMinutos(), ChronoUnit.MINUTES);
 
         JwtClaimsSet.Builder claims = JwtClaimsSet.builder()

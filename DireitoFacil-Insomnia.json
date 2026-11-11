@@ -1,0 +1,1823 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-11-11T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v12.5.0",
+  "resources": [
+    {
+      "_id": "wrk_direitofacil0000000000001",
+      "parentId": null,
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "Direito Fácil API - Java",
+      "description": "Coleção da API Java do Direito Fácil. Rode 00 - Auth e cole os tokens no Base Environment (valem 60 minutos). As pastas seguem a ordem da demonstração.",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_direitofacil0000000000001",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8080",
+        "token_gestor": "",
+        "token_cidadao": "",
+        "token_cidadao_helena": "",
+        "pessoa_lucas_id": 1,
+        "pessoa_helena_id": 3,
+        "pessoa_marcos_id": 4,
+        "nova_pessoa_id": 6,
+        "caso_id": 2,
+        "caso_concedido_id": 4,
+        "direito_teste_id": 21,
+        "documento_demo_id": 6,
+        "receita_id": 1
+      },
+      "dataPropertyOrder": null,
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_direitofacil0000000000001",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "00 - Auth",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 1000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000001",
+      "parentId": "fld_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/auth/login",
+      "name": "Login - Gestor (assistente social)",
+      "description": "Esperado: 200. Público. Copie o token para token_gestor no Base Environment.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"rafaela.gomes@cras.gov.br\",\n  \"senha\": \"Senha@123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 0,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000002",
+      "parentId": "fld_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/auth/login",
+      "name": "Login - Cidadão (Ana, responsável pelo Lucas)",
+      "description": "Esperado: 200. Público. Copie o token para token_cidadao no Base Environment.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"ana.almeida@email.com\",\n  \"senha\": \"Senha@123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 10,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000003",
+      "parentId": "fld_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/auth/login",
+      "name": "Login - Cidadã (Paula, responsável pela Helena)",
+      "description": "Esperado: 200. Público. Copie o token para token_cidadao_helena (usado na receita da Helena).",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"paula.souza@email.com\",\n  \"senha\": \"Senha@123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 20,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000004",
+      "parentId": "fld_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/auth/login",
+      "name": "Login inválido - validação 400",
+      "description": "Esperado: 400 com a lista de campos inválidos.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"email-invalido\",\n  \"senha\": \"\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 30,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000005",
+      "parentId": "fld_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/auth/login",
+      "name": "Login com senha errada - 401",
+      "description": "Esperado: 401.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"ana.almeida@email.com\",\n  \"senha\": \"SenhaErrada1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 40,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000006",
+      "parentId": "fld_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/auth/registrar",
+      "name": "Registrar cidadão",
+      "description": "Esperado: 201. Público. Cria um CIDADAO e já devolve o token. Rodar de novo devolve 409 (e-mail ou CPF já cadastrado).",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Cidadao Demonstracao\",\n  \"cpf\": \"529.982.247-25\",\n  \"email\": \"cidadao.demo@email.com\",\n  \"senha\": \"SenhaForte1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 50,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000007",
+      "parentId": "fld_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/usuarios/me",
+      "name": "Minha conta (/usuarios/me)",
+      "description": "Esperado: 200. Conta do usuário do token.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 60,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000002",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "01 - Catálogo de direitos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 2000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000008",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/direitos?page=0&size=20",
+      "name": "Listar direitos (paginado)",
+      "description": "Esperado: 200. Os 20 direitos do catálogo, todos VERIFICADO.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 70,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000009",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/direitos?grupoAlvo=PCD",
+      "name": "Direitos de PcD",
+      "description": "Esperado: 200. Filtro por grupo alvo.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 80,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000010",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/direitos/codigo/ISENCAO_IOF_VEICULO_PCD",
+      "name": "Direito por código (IOF exige deficiência física)",
+      "description": "Esperado: 200. Mostra o critério com tipoExigido DEF_FISICA.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 90,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000011",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/salario-minimo",
+      "name": "Salário mínimo vigente",
+      "description": "Esperado: 200. Referência dos limites de renda.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000012",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/direitos",
+      "name": "Criar direito - gestor",
+      "description": "Esperado: 201. Só GESTOR. Copie o id para direito_teste_id. Rodar de novo devolve 409 (código já cadastrado).",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"codigo\": \"DIREITO_TESTE_DEMO\",\n  \"nome\": \"Direito de teste da demonstracao\",\n  \"orgao\": \"Orgao de teste\",\n  \"baseLegal\": \"Lei de teste\",\n  \"grupoAlvo\": \"IDOSO\",\n  \"prazoDias\": 30,\n  \"statusVerificacao\": \"CONFIRMAR\",\n  \"criterio\": {\n    \"idadeMin\": 60,\n    \"idadeMax\": null,\n    \"exigePcd\": false,\n    \"exigeTea\": false,\n    \"fracaoSmMax\": null,\n    \"pctTolerancia\": 0,\n    \"tipoExigido\": null,\n    \"rendaIndividual\": false\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 110,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000013",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/direitos",
+      "name": "Criar direito - cidadão (403)",
+      "description": "Esperado: 403, o papel é conferido antes da validação do corpo.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"codigo\": \"DIREITO_TESTE_DEMO\",\n  \"nome\": \"Direito de teste da demonstracao\",\n  \"orgao\": \"Orgao de teste\",\n  \"baseLegal\": \"Lei de teste\",\n  \"grupoAlvo\": \"IDOSO\",\n  \"prazoDias\": 30,\n  \"statusVerificacao\": \"CONFIRMAR\",\n  \"criterio\": {\n    \"idadeMin\": 60,\n    \"idadeMax\": null,\n    \"exigePcd\": false,\n    \"exigeTea\": false,\n    \"fracaoSmMax\": null,\n    \"pctTolerancia\": 0,\n    \"tipoExigido\": null,\n    \"rendaIndividual\": false\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 120,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000014",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/direitos/{{ _.direito_teste_id }}",
+      "name": "Excluir direito de teste - gestor",
+      "description": "Esperado: 204. Só GESTOR. Remove o direito criado acima.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 130,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000003",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "02 - Pessoas e elegibilidade",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 3000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000015",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas",
+      "name": "Meus beneficiários (cidadão)",
+      "description": "Esperado: 200. Cidadão vê só os próprios beneficiários (Ana: Lucas).",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 140,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000016",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas?nome=a",
+      "name": "Todas as pessoas (gestor)",
+      "description": "Esperado: 200. Gestor vê todas e pode filtrar por nome.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 150,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000017",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.pessoa_lucas_id }}",
+      "name": "Buscar pessoa (Lucas)",
+      "description": "Esperado: 200. Idade e renda per capita calculadas.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 160,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000018",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas",
+      "name": "Cadastrar pessoa idosa (abre casos e publica eventos)",
+      "description": "Esperado: 201. A regra PL/SQL abre os casos ELEGIVEL/POSSIVEL e o Java publica DireitoIdentificado no RabbitMQ. Copie o id para nova_pessoa_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Dona Maria Demonstracao\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": 700\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 170,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000019",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.nova_pessoa_id }}",
+      "name": "Atualizar renda individual para 'não sei' (reavaliação)",
+      "description": "Esperado: 200. rendaIndividual nula = 'não sei'. O passe do idoso vira POSSIVEL com o motivo 'Informe a renda individual' (PRC_REAVALIAR_CASOS).",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Dona Maria Demonstracao\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": null\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 180,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000020",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.nova_pessoa_id }}/elegibilidade",
+      "name": "Avaliar todo o catálogo (sem gravar)",
+      "description": "Esperado: 200. Resultado e motivo de cada direito, inclusive os NAO_ELEGIVEL.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 190,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000021",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas",
+      "name": "Validação: renda individual maior que a familiar (400)",
+      "description": "Esperado: 400.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Teste\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": 900\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000022",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.pessoa_lucas_id }}",
+      "name": "Excluir pessoa com caso em andamento (409)",
+      "description": "Esperado: 409. O Lucas tem casos que já saíram de ABERTO.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 210,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000023",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.nova_pessoa_id }}",
+      "name": "Excluir pessoa nova",
+      "description": "Esperado: 204. Remove a pessoa e os casos ABERTO; a auditoria do banco registra os DELETE.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 220,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000004",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "03 - Laudos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 4000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000024",
+      "parentId": "fld_direitofacil0000000000004",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/laudos",
+      "name": "Registrar laudo (gestor) - deficiência física do Marcos",
+      "description": "Esperado: 201. Só GESTOR (ou a extração da IA). Reavalia a pessoa e abre os casos de PcD.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pessoaId\": 4,\n  \"codCid\": \"G82.2\",\n  \"condicao\": \"Paraplegia\",\n  \"tipoCondicao\": \"DEF_FISICA\",\n  \"dataLaudo\": \"2026-10-01\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 230,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000025",
+      "parentId": "fld_direitofacil0000000000004",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.pessoa_marcos_id }}/laudos",
+      "name": "Laudos da pessoa",
+      "description": "Esperado: 200. ",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 240,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000005",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "04 - Casos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 5000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000026",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/me",
+      "name": "Meus casos (cidadão)",
+      "description": "Esperado: 200. Lista 'meus pedidos' do app.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 250,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000027",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos?resultado=POSSIVEL",
+      "name": "Casos POSSIVEL (gestor)",
+      "description": "Esperado: 200. Filtros por pessoa, status e resultado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 260,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000028",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/1",
+      "name": "Detalhe do caso 1",
+      "description": "Esperado: 200. ",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 270,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000029",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/1/historico",
+      "name": "Histórico do caso 1 (auditoria)",
+      "description": "Esperado: 200. Lido da trilha gravada pelo gatilho TRG_DF_AUDITORIA_CASO.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 280,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000030",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/status",
+      "name": "Mudar status do caso (gestor)",
+      "description": "Esperado: 200. Passa pela PKG_CASOS; o gatilho valida o fluxo e grava a auditoria.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"EM_ANALISE\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 290,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000031",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_concedido_id }}/status",
+      "name": "Transição inválida - caso CONCEDIDO (409)",
+      "description": "Esperado: 409 com ORA-20032 vindo do gatilho.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"ABERTO\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 300,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000032",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/status",
+      "name": "Cidadão tenta mudar status (403)",
+      "description": "Esperado: 403.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"EM_ANALISE\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 310,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000033",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/orientacao",
+      "name": "Registrar orientação (gestor/RAG)",
+      "description": "Esperado: 200. Grava ou substitui o passo a passo com a fonte.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"passoAPasso\": \"1. Reuna o laudo e o comprovante do CadUnico. 2. Solicite no site do Ministerio dos Transportes.\",\n  \"fonte\": \"Lei 8.899/1994\",\n  \"modelo\": \"demo\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 320,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000034",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/orientacao",
+      "name": "Ver orientação do caso",
+      "description": "Esperado: 200. ",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 330,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000006",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "05 - Documentos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 6000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000035",
+      "parentId": "fld_direitofacil0000000000006",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/documentos",
+      "name": "Registrar documento (metadados do arquivo da .NET)",
+      "description": "Esperado: 201. Copie o id para documento_demo_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pessoaId\": 1,\n  \"idExterno\": \"dotnet-doc-insomnia-1\",\n  \"nomeArquivo\": \"laudo_demo.pdf\",\n  \"tipoMidia\": \"application/pdf\",\n  \"tamanhoBytes\": 12345,\n  \"chaveIdempotencia\": \"insomnia-idem-1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 340,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000036",
+      "parentId": "fld_direitofacil0000000000006",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/documentos",
+      "name": "Reenviar o mesmo documento (idempotência)",
+      "description": "Esperado: 201. Mesma chave de idempotência: devolve o mesmo registro, sem duplicar.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pessoaId\": 1,\n  \"idExterno\": \"dotnet-doc-insomnia-1\",\n  \"nomeArquivo\": \"laudo_demo.pdf\",\n  \"tipoMidia\": \"application/pdf\",\n  \"tamanhoBytes\": 12345,\n  \"chaveIdempotencia\": \"insomnia-idem-1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 350,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000037",
+      "parentId": "fld_direitofacil0000000000006",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/documentos",
+      "name": "Listar documentos (cidadão)",
+      "description": "Esperado: 200. ",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 360,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000038",
+      "parentId": "fld_direitofacil0000000000006",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/documentos/{{ _.documento_demo_id }}",
+      "name": "Excluir documento",
+      "description": "Esperado: 204. Devolve 409 se o documento já virou laudo ou receita.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 370,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000007",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "06 - Farmácia Popular",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 7000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000039",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/farmacia-popular/medicamentos",
+      "name": "Elenco oficial (41 itens)",
+      "description": "Esperado: 200. Fonte e data do elenco em cada item.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 380,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000040",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/farmacia-popular/medicamentos?indicacao=HIPERTENSAO",
+      "name": "Elenco - hipertensão",
+      "description": "Esperado: 200. ",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 390,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000041",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/farmacia-popular/consulta?principioAtivo=timolol&concentracao=2.5%20mg",
+      "name": "Consultar remédio (timolol 2.5 mg)",
+      "description": "Esperado: 200. Vírgula e ponto valem o mesmo: GRATUITO.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 400,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000042",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas",
+      "name": "Abrir receita da Helena",
+      "description": "Esperado: 201. Copie o id para receita_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pessoaId\": 3\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao_helena }}"
+      },
+      "metaSortKey": 410,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000043",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas/{{ _.receita_id }}/itens",
+      "name": "Item conferido - losartana 50mg (GRATUITO)",
+      "description": "Esperado: 201. ",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nomeLido\": \"Losartana 50 mg\",\n  \"principioAtivo\": \"losartana\",\n  \"concentracao\": \"50mg\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao_helena }}"
+      },
+      "metaSortKey": 420,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000044",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas/{{ _.receita_id }}/itens",
+      "name": "Item conferido - metformina corrigida pela pessoa (GRATUITO)",
+      "description": "Esperado: 201. ",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nomeLido\": \"Metformina 500\",\n  \"principioAtivo\": \"Metformina\",\n  \"concentracao\": \"500 mg\",\n  \"corrigido\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao_helena }}"
+      },
+      "metaSortKey": 430,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000045",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas/{{ _.receita_id }}/itens",
+      "name": "Item conferido - atenolol 100mg (DOSAGEM_DIVERGENTE)",
+      "description": "Esperado: 201. A orientação manda confirmar na farmácia; o app nunca sugere trocar o remédio.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nomeLido\": \"Atenolol 100\",\n  \"principioAtivo\": \"atenolol\",\n  \"concentracao\": \"100mg\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao_helena }}"
+      },
+      "metaSortKey": 440,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000046",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas/{{ _.receita_id }}/itens",
+      "name": "Item conferido - clonazepam (NAO_ENCONTRADO)",
+      "description": "Esperado: 201. ",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nomeLido\": \"Rivotril 2mg\",\n  \"principioAtivo\": \"clonazepam\",\n  \"concentracao\": \"2mg\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao_helena }}"
+      },
+      "metaSortKey": 450,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000047",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas/{{ _.receita_id }}",
+      "name": "Ver receita (resumo)",
+      "description": "Esperado: 200. Total de itens e quantos são gratuitos.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao_helena }}"
+      },
+      "metaSortKey": 460,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000048",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas/{{ _.receita_id }}",
+      "name": "Outra cidadã tenta ver a receita (403)",
+      "description": "Esperado: 403.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 470,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000008",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "07 - RabbitMQ e painel do gestor",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 8000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000049",
+      "parentId": "fld_direitofacil0000000000008",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/painel/verificar-prazos?diasPrazo=30&diasParado=3",
+      "name": "Verificar prazos agora (202)",
+      "description": "Esperado: 202. Publica PrazoVencendo e CasoParado na fila; o consumidor processa depois (202 Accepted).",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 480,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000050",
+      "parentId": "fld_direitofacil0000000000008",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/painel/eventos",
+      "name": "Avisos consumidos da fila",
+      "description": "Esperado: 200. Eventos que o @RabbitListener recebeu (DireitoIdentificado, PrazoVencendo, CasoParado).",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 490,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000051",
+      "parentId": "fld_direitofacil0000000000008",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/painel/eventos",
+      "name": "Painel com cidadão (403)",
+      "description": "Esperado: 403.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 500,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000009",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "08 - Segurança",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 9000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000052",
+      "parentId": "fld_direitofacil0000000000009",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas",
+      "name": "Sem token (401)",
+      "description": "Esperado: 401 com o corpo de erro padrão.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 510,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000053",
+      "parentId": "fld_direitofacil0000000000009",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas",
+      "name": "Token inválido (401)",
+      "description": "Esperado: 401.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "token.invalido.demo"
+      },
+      "metaSortKey": 520,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000054",
+      "parentId": "fld_direitofacil0000000000009",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/gestores",
+      "name": "Cidadão em /gestores (403)",
+      "description": "Esperado: 403.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 530,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000055",
+      "parentId": "fld_direitofacil0000000000009",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/v3/api-docs",
+      "name": "OpenAPI público",
+      "description": "Esperado: 200. Swagger em /swagger-ui.html.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 540,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000010",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "09 - Conta",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 10000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000056",
+      "parentId": "fld_direitofacil0000000000010",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/auth/senha",
+      "name": "Trocar a própria senha",
+      "description": "Esperado: 204. Depois rode 'Voltar a senha original'.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"senhaAtual\": \"Senha@123\",\n  \"novaSenha\": \"NovaSenha123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 550,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000057",
+      "parentId": "fld_direitofacil0000000000010",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/auth/senha",
+      "name": "Voltar a senha original",
+      "description": "Esperado: 204. Deixa a senha de demonstração como estava.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"senhaAtual\": \"NovaSenha123\",\n  \"novaSenha\": \"Senha@123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 560,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    }
+  ]
+}
