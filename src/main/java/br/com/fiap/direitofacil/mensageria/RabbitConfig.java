@@ -21,6 +21,9 @@ public class RabbitConfig {
     public static final String CASOS_EXCHANGE = "direitofacil.casos.exchange";
     public static final String PAINEL_GESTOR_QUEUE = "direitofacil.painel-gestor";
 
+    /** Fila da API .NET (exchange padrão): um evento DocumentoRecebido a cada upload. */
+    public static final String DOCUMENTOS_RECEBIDOS_QUEUE = "documentos.recebidos";
+
     public static final String DIREITO_IDENTIFICADO_ROUTING_KEY = "caso.direito-identificado";
     public static final String PRAZO_VENCENDO_ROUTING_KEY = "caso.prazo-vencendo";
     public static final String CASO_PARADO_ROUTING_KEY = "caso.parado";
@@ -28,6 +31,12 @@ public class RabbitConfig {
     @Bean
     Queue painelGestorQueue() {
         return QueueBuilder.durable(PAINEL_GESTOR_QUEUE).build();
+    }
+
+    /** Mesma declaração da .NET (durável); assim o consumidor sobe mesmo antes do primeiro upload. */
+    @Bean
+    Queue documentosRecebidosQueue() {
+        return QueueBuilder.durable(DOCUMENTOS_RECEBIDOS_QUEUE).build();
     }
 
     @Bean
