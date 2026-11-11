@@ -36,6 +36,7 @@ public final class DtoMapper {
                 pessoa.getRendaFamiliar(),
                 pessoa.getQtdMembrosFamilia(),
                 pessoa.getRendaPerCapita(),
+                pessoa.getRendaIndividual(),
                 pessoa.getDataCadastro()
         );
     }
@@ -57,7 +58,9 @@ public final class DtoMapper {
                 criterio.getExigePcd(),
                 criterio.getExigeTea(),
                 criterio.getFracaoSmMax(),
-                criterio.getPctTolerancia()
+                criterio.getPctTolerancia(),
+                criterio.getTipoExigido(),
+                criterio.getRendaIndividual()
         );
     }
 

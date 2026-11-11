@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Beneficiário acompanhado por um usuário responsável (ex.: o filho autista da
- * Ana). Idade, renda familiar e número de membros são o que a regra PL/SQL lê.
+ * Ana). Idade, renda familiar, renda individual e número de membros são o que a regra PL/SQL lê.
  */
 @Getter
 @Setter
@@ -50,6 +50,11 @@ public class Pessoa {
     @PositiveOrZero
     @Column(name = "VLR_RENDA_FAMILIAR", nullable = false, precision = 10, scale = 2)
     private BigDecimal rendaFamiliar;
+
+    /** Renda da própria pessoa. Nulo = "não sei" (a regra devolve POSSIVEL); zero = sem renda própria. */
+    @PositiveOrZero
+    @Column(name = "VLR_RENDA_INDIVIDUAL", precision = 10, scale = 2)
+    private BigDecimal rendaIndividual;
 
     @NotNull
     @Min(1)

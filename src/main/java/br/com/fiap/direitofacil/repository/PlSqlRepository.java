@@ -22,6 +22,7 @@ public class PlSqlRepository {
     private final SimpleJdbcCall avaliarDireito;
     private final SimpleJdbcCall avaliarElegibilidade;
     private final SimpleJdbcCall abrirCasos;
+    private final SimpleJdbcCall reavaliarCasos;
     private final SimpleJdbcCall atualizarStatusCaso;
     private final SimpleJdbcCall registrarOrientacao;
 
@@ -37,6 +38,10 @@ public class PlSqlRepository {
         this.abrirCasos = new SimpleJdbcCall(dataSource)
                 .withCatalogName("PKG_ELEGIBILIDADE")
                 .withProcedureName("PRC_ABRIR_CASOS");
+
+        this.reavaliarCasos = new SimpleJdbcCall(dataSource)
+                .withCatalogName("PKG_ELEGIBILIDADE")
+                .withProcedureName("PRC_REAVALIAR_CASOS");
 
         this.atualizarStatusCaso = new SimpleJdbcCall(dataSource)
                 .withCatalogName("PKG_CASOS")
@@ -73,6 +78,17 @@ public class PlSqlRepository {
     /** Percorre o catálogo e abre um caso para cada direito ELEGIVEL ou POSSIVEL, sem duplicar. */
     public void abrirCasos(Long pessoaId, LocalDateTime dataReferencia) {
         abrirCasos.execute(Map.of(
+                "P_ID_PESSOA", pessoaId,
+                "P_DT_REF", Timestamp.valueOf(dataReferencia)
+        ));
+    }
+
+    /**
+     * Reavalia a pessoa depois que a renda ou os laudos mudam: atualiza os casos ABERTO,
+     * remove os ABERTO que deixaram de ser elegíveis e abre os novos. Outros status não mudam.
+     */
+    public void reavaliarCasos(Long pessoaId, LocalDateTime dataReferencia) {
+        reavaliarCasos.execute(Map.of(
                 "P_ID_PESSOA", pessoaId,
                 "P_DT_REF", Timestamp.valueOf(dataReferencia)
         ));

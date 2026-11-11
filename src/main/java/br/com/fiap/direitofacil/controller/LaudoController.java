@@ -27,7 +27,7 @@ public class LaudoController {
 
     @PostMapping
     @Operation(summary = "Registrar laudo",
-            description = "Exclusivo do gestor. Grava o laudo estruturado e dispara a PKG_ELEGIBILIDADE, que abre um caso para cada direito ELEGIVEL ou POSSIVEL da pessoa.")
+            description = "Exclusivo do gestor. Grava o laudo estruturado e dispara a PKG_ELEGIBILIDADE.PRC_REAVALIAR_CASOS, que atualiza os casos ABERTO e abre um caso para cada direito ELEGIVEL ou POSSIVEL da pessoa.")
     public ResponseEntity<LaudoResponse> registrar(@RequestBody @Valid LaudoRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.registrar(request));
     }

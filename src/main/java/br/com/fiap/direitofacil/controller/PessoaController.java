@@ -47,7 +47,7 @@ public class PessoaController {
     }
 
     @PostMapping
-    @Operation(summary = "Cadastrar pessoa", description = "Cidadão cadastra sob a própria conta; gestor informa o responsável em usuarioId.")
+    @Operation(summary = "Cadastrar pessoa", description = "Cidadão cadastra sob a própria conta; gestor informa o responsável em usuarioId. Já abre os casos ELEGIVEL e POSSIVEL pela regra PL/SQL. rendaIndividual nula = 'não sei'.")
     public ResponseEntity<PessoaResponse> criar(
             @RequestBody @Valid PessoaRequest request,
             @RequestParam(required = false) Long usuarioId) {
@@ -55,7 +55,7 @@ public class PessoaController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar pessoa", description = "Altera nome, nascimento, renda familiar e número de membros.")
+    @Operation(summary = "Atualizar pessoa", description = "Altera nome, nascimento, rendas e número de membros, e reavalia os casos ABERTO pela PKG_ELEGIBILIDADE.PRC_REAVALIAR_CASOS.")
     public PessoaResponse atualizar(@PathVariable Long id, @RequestBody @Valid PessoaRequest request) {
         return service.atualizar(id, request);
     }

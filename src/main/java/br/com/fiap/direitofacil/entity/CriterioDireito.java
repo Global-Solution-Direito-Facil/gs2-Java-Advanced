@@ -1,6 +1,7 @@
 package br.com.fiap.direitofacil.entity;
 
 import br.com.fiap.direitofacil.config.BooleanToCharacterConverter;
+import br.com.fiap.direitofacil.enums.TipoCondicao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -8,8 +9,9 @@ import lombok.*;
 import java.math.BigDecimal;
 
 /**
- * A regra de elegibilidade em forma de dados: faixa etária, exige PcD ou TEA,
- * fração máxima do salário mínimo per capita e tolerância. 1:1 com o direito.
+ * A regra de elegibilidade em forma de dados: faixa etária, exige PcD ou TEA, tipo de
+ * deficiência exigido, fração máxima do salário mínimo (per capita ou individual) e
+ * tolerância. 1:1 com o direito.
  */
 @Getter
 @Setter
@@ -51,6 +53,18 @@ public class CriterioDireito {
     @Convert(converter = BooleanToCharacterConverter.class)
     @Column(name = "STA_EXIGE_TEA", nullable = false)
     private Boolean exigeTea = false;
+
+    /** Tipo de laudo exigido (ex.: DEF_FISICA na isenção de IOF); nulo = qualquer deficiência serve. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "COD_TIPO_EXIGIDO", length = 20)
+    private TipoCondicao tipoExigido;
+
+    /** Verdadeiro quando o limite vale para a renda da própria pessoa (passe do idoso), e não per capita. */
+    @NotNull
+    @Builder.Default
+    @Convert(converter = BooleanToCharacterConverter.class)
+    @Column(name = "STA_RENDA_INDIVIDUAL", nullable = false)
+    private Boolean rendaIndividual = false;
 
     @DecimalMin("0.0001")
     @Column(name = "FRC_SM_MAX", precision = 6, scale = 4)

@@ -7,6 +7,7 @@ import br.com.fiap.direitofacil.entity.Pessoa;
 import br.com.fiap.direitofacil.entity.Usuario;
 import br.com.fiap.direitofacil.enums.Role;
 import br.com.fiap.direitofacil.repository.PessoaRepository;
+import br.com.fiap.direitofacil.repository.PlSqlRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,12 +16,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class PessoaService {
 
     private final PessoaRepository repository;
     private final UsuarioService usuarioService;
+    private final PlSqlRepository plSqlRepository;
 
     @Transactional(readOnly = true)
     public Page<PessoaResponse> listar(String nome, Pageable pageable) {
@@ -38,7 +42,10 @@ public class PessoaService {
         return DtoMapper.toResponse(findEntityByIdAutorizado(id));
     }
 
-    /** Cidadão cadastra sob a própria conta; gestor informa o responsável, que precisa ser um CIDADAO. */
+    /**
+     * Cidadão cadastra sob a própria conta; gestor informa o responsável, que precisa ser um CIDADAO.
+     * Já avalia o catálogo: direitos só de idade e renda (BPC idoso, tarifa social...) não dependem de laudo.
+     */
     @Transactional
     public PessoaResponse criar(PessoaRequest request, Long usuarioId) {
         Long responsavelId = CurrentUser.isGestor() ? usuarioId : CurrentUser.requireUsuarioId();
@@ -49,16 +56,19 @@ public class PessoaService {
         if (responsavel.getPerfil() != Role.CIDADAO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "O responsável precisa ser um cidadão.");
         }
-        Pessoa pessoa = repository.save(Pessoa.builder()
+        Pessoa pessoa = repository.saveAndFlush(Pessoa.builder()
                 .usuario(responsavel)
                 .nome(request.nome())
                 .dataNascimento(request.dataNascimento())
                 .rendaFamiliar(request.rendaFamiliar())
                 .qtdMembrosFamilia(request.qtdMembrosFamilia())
+                .rendaIndividual(request.rendaIndividual())
                 .build());
+        plSqlRepository.abrirCasos(pessoa.getId(), LocalDateTime.now());
         return DtoMapper.toResponse(pessoa);
     }
 
+    /** Atualiza os dados e reavalia os casos ABERTO, porque renda e idade mudam o resultado da regra. */
     @Transactional
     public PessoaResponse atualizar(Long id, PessoaRequest request) {
         Pessoa pessoa = findEntityByIdAutorizado(id);
@@ -66,7 +76,10 @@ public class PessoaService {
         pessoa.setDataNascimento(request.dataNascimento());
         pessoa.setRendaFamiliar(request.rendaFamiliar());
         pessoa.setQtdMembrosFamilia(request.qtdMembrosFamilia());
-        return DtoMapper.toResponse(repository.save(pessoa));
+        pessoa.setRendaIndividual(request.rendaIndividual());
+        Pessoa salva = repository.saveAndFlush(pessoa);
+        plSqlRepository.reavaliarCasos(salva.getId(), LocalDateTime.now());
+        return DtoMapper.toResponse(salva);
     }
 
     /** Carrega a entidade ou lança 404; usado por documento, laudo e elegibilidade. */

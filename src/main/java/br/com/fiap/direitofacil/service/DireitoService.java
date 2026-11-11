@@ -133,5 +133,7 @@ public class DireitoService {
         criterio.setExigeTea(request.exigeTea());
         criterio.setFracaoSmMax(request.fracaoSmMax());
         criterio.setPctTolerancia(request.pctTolerancia());
+        criterio.setTipoExigido(request.tipoExigido());
+        criterio.setRendaIndividual(Boolean.TRUE.equals(request.rendaIndividual()));
     }
 }

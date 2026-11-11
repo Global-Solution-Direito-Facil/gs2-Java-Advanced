@@ -127,7 +127,8 @@ public class GlobalExceptionHandler {
     /** Códigos definidos nos packages e gatilhos do banco (README do DireitoFacil-DB, seção 7). */
     private HttpStatus statusDoErroOracle(int codigo) {
         return switch (codigo) {
-            case 20020, 20022, 20023, 20040, 20041 -> HttpStatus.NOT_FOUND;
+            case 20020, 20022, 20023, 20040, 20041, 20051, 20060, 20061 -> HttpStatus.NOT_FOUND;
+            case 20050 -> HttpStatus.BAD_REQUEST;
             case 20031, 20034 -> HttpStatus.UNPROCESSABLE_ENTITY;
             case 20032, 20033 -> HttpStatus.CONFLICT;
             case 1 -> HttpStatus.CONFLICT;

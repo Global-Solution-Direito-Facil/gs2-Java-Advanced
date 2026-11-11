@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/** Beneficiário com idade e renda per capita calculadas e o responsável resumido. */
+/** Beneficiário com idade e renda per capita calculadas e o responsável resumido; rendaIndividual nula = não informada. */
 public record PessoaResponse(
         Long id,
         UsuarioResumoResponse responsavel,
@@ -14,5 +14,6 @@ public record PessoaResponse(
         BigDecimal rendaFamiliar,
         Integer qtdMembrosFamilia,
         BigDecimal rendaPerCapita,
+        BigDecimal rendaIndividual,
         LocalDateTime dataCadastro
 ) {}

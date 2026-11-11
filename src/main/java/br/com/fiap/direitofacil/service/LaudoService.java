@@ -40,8 +40,9 @@ public class LaudoService {
     }
 
     /**
-     * Grava o laudo estruturado (só gestor ou a extração da IA) e dispara a regra PL/SQL,
-     * que abre os casos ELEGIVEL e POSSIVEL da pessoa. Reprocessar o mesmo documento devolve o laudo já existente.
+     * Grava o laudo estruturado (só gestor ou a extração da IA) e dispara a reavaliação PL/SQL,
+     * que atualiza os casos ABERTO e abre os ELEGIVEL e POSSIVEL da pessoa. Reprocessar o mesmo
+     * documento devolve o laudo já existente.
      */
     @Transactional
     public LaudoResponse registrar(LaudoRequest request) {
@@ -69,7 +70,7 @@ public class LaudoService {
                 .dataLaudo(request.dataLaudo())
                 .build());
 
-        elegibilidadeService.abrirCasos(pessoa.getId());
+        elegibilidadeService.reavaliarCasos(pessoa.getId());
         if (documento != null) {
             documentoService.marcarProcessado(documento.getId());
         }

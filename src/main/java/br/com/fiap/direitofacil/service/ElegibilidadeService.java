@@ -35,6 +35,13 @@ public class ElegibilidadeService {
         plSqlRepository.abrirCasos(pessoaId, LocalDateTime.now());
     }
 
+    /** Reavalia os casos ABERTO da pessoa e abre os novos; usado quando o laudo ou a renda mudam. */
+    @Transactional
+    public void reavaliarCasos(Long pessoaId) {
+        pessoaService.findEntityByIdAutorizado(pessoaId);
+        plSqlRepository.reavaliarCasos(pessoaId, LocalDateTime.now());
+    }
+
     /** Chama a procedure para um direito e monta o response com o resumo do direito. */
     private AvaliacaoDireitoResponse avaliar(Long pessoaId, Direito direito, LocalDateTime dataReferencia) {
         PlSqlRepository.Avaliacao avaliacao = plSqlRepository.avaliarDireito(pessoaId, direito.getId(), dataReferencia);
