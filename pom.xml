@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>br.com.fiap</groupId>
-    <artifactId>DiretoFacil</artifactId>
+    <artifactId>DireitoFacil</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>DiretoFacil</name>
+    <name>DireitoFacil</name>
     <description>Backend Java da CitizenTech "O laudo que abre portas": o cidadão envia o laudo médico, a regra decide a elegibilidade aos direitos e a IA explica o passo a passo.</description>
 
     <properties>
