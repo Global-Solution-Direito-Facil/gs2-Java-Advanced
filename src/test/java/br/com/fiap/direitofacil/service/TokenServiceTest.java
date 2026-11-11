@@ -52,6 +52,20 @@ class TokenServiceTest {
     }
 
     @Test
+    void tokenDeServicoTemPapelServicoEValeCincoMinutos() {
+        TokenService.Token token = tokenService.gerarServico();
+
+        Jwt jwt = NimbusJwtDecoder.withSecretKey(chave).macAlgorithm(MacAlgorithm.HS256).build().decode(token.valor());
+
+        assertThat(jwt.getClaimAsString("role")).isEqualTo("SERVICO");
+        assertThat(jwt.getClaimAsString("iss")).isEqualTo("direitofacil");
+        assertThat(jwt.getAudience()).containsExactly("direitofacil-app");
+        assertThat(jwt.getSubject()).isEqualTo(jwt.getClaimAsString("email"));
+        assertThat(jwt.hasClaim("usuarioId")).isFalse();
+        assertThat(java.time.Duration.between(jwt.getIssuedAt(), jwt.getExpiresAt())).isEqualTo(java.time.Duration.ofMinutes(5));
+    }
+
+    @Test
     void tokenNaoValidaComOutraChave() {
         TokenService.Token token = tokenService.gerar(usuario(Role.GESTOR));
         SecretKeySpec outraChave = new SecretKeySpec("outra-chave-qualquer-com-32-caracteres!!".getBytes(StandardCharsets.UTF_8), "HmacSHA256");

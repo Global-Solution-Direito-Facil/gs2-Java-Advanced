@@ -258,6 +258,8 @@ O Flyway cria as tabelas, os pacotes PL/SQL e os dados de demonstração na prim
 | `RABBITMQ_HOST` / `RABBITMQ_PORT` | não | `localhost` / `5672` |
 | `RABBITMQ_USERNAME` / `RABBITMQ_PASSWORD` | não | `myuser` / `secret` (iguais ao `docker-compose.yml`) |
 | `RABBITMQ_VHOST` / `RABBITMQ_SSL` | não | `/` / `false` |
+| `DOTNET_API_URL` | não | URL da API .NET, sem o prefixo (ex.: `https://host`); sem ela as chamadas para a .NET ficam indisponíveis |
+| `DOTNET_API_PREFIX` | não | `/api/v1` |
 | `MONITOR_CRON` | não | `0 0 8 * * *` (todo dia às 8h) |
 | `PORT` | não | `8080` |
 
@@ -460,6 +462,7 @@ Quem decide é a tabela `T_DF_MEDICAMENTO_FP`, com o elenco oficial de 41 itens 
 
 - **App Mobile:** faz login só nesta API (`POST /api/v1/auth/login`) e consome as rotas `/api/v1/...`. As listagens são paginadas (`content`, `page`, `size`, `totalElements`, `totalPages`).
 - **API .NET (documentos e envios):** tem banco próprio. Aceita o token emitido por esta API: HS256, mesma `JWT_SECRET`, mesmos `iss` e `aud`, `sub` = e-mail, `role` sem prefixo. O e-mail liga os documentos à pessoa.
+- **Chamadas do Java para a .NET (`integracao/DocumentosDotnetClient`):** `GET /api/v1/documentos/{id}/arquivo` para baixar o arquivo e `PATCH /api/v1/documentos/{id}/status` com `EXTRAIDO` ou `FALHA`. As duas usam um token de papel `SERVICO`, gerado pelo próprio Java, que vale 5 minutos e nunca passa pelo app.
 - **Evento `DocumentoRecebido`:** publicado pela .NET quando o arquivo chega. O consumidor no Java será ligado quando o formato da mensagem for fechado com a .NET. Até lá, o registro do documento é feito por `POST /api/v1/documentos`.
 
 ---
@@ -514,6 +517,7 @@ mvnw.cmd clean test      # Windows
 
 - `SegurancaEndpointsTest` (MockMvc, sem banco): 401 sem token com o corpo padrão, 403 para papel errado (antes da validação do corpo), 400 de validação para o gestor, painel restrito ao GESTOR e login público.
 - `TokenServiceTest` (sem banco): contrato do token com a .NET (HS256, `sub` = e-mail, `role` sem `ROLE_`), token recusado com outra chave e chave curta impedindo a subida.
+- `DocumentosDotnetClientTest` (sem banco, servidor HTTP local): rotas, token `SERVICO` e corpo do `PATCH` nas chamadas para a .NET, e o comportamento quando ela falha.
 - `DireitoFacilApplicationTests`: sobe o contexto completo. Só roda com `DB_URL` e `JWT_SECRET` definidas.
 
 ---
