@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class PessoaService {
     private final PessoaRepository repository;
     private final UsuarioService usuarioService;
     private final PlSqlRepository plSqlRepository;
+    private final CasoEventoService casoEventoService;
 
     @Transactional(readOnly = true)
     public Page<PessoaResponse> listar(String nome, Pageable pageable) {
@@ -65,6 +67,7 @@ public class PessoaService {
                 .rendaIndividual(request.rendaIndividual())
                 .build());
         plSqlRepository.abrirCasos(pessoa.getId(), LocalDateTime.now());
+        casoEventoService.publicarNovos(pessoa.getId(), Set.of());
         return DtoMapper.toResponse(pessoa);
     }
 
@@ -78,7 +81,9 @@ public class PessoaService {
         pessoa.setQtdMembrosFamilia(request.qtdMembrosFamilia());
         pessoa.setRendaIndividual(request.rendaIndividual());
         Pessoa salva = repository.saveAndFlush(pessoa);
+        Set<Long> casosAntes = casoEventoService.idsDosCasos(salva.getId());
         plSqlRepository.reavaliarCasos(salva.getId(), LocalDateTime.now());
+        casoEventoService.publicarNovos(salva.getId(), casosAntes);
         return DtoMapper.toResponse(salva);
     }
 

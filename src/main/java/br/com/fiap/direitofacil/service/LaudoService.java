@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class LaudoService {
     private final PessoaService pessoaService;
     private final DocumentoService documentoService;
     private final ElegibilidadeService elegibilidadeService;
+    private final CasoEventoService casoEventoService;
 
     @Transactional(readOnly = true)
     public List<LaudoResponse> listarPorPessoa(Long pessoaId) {
@@ -61,6 +63,7 @@ public class LaudoService {
             }
         }
 
+        Set<Long> casosAntes = casoEventoService.idsDosCasos(pessoa.getId());
         Laudo laudo = repository.saveAndFlush(Laudo.builder()
                 .pessoa(pessoa)
                 .documento(documento)
@@ -71,6 +74,7 @@ public class LaudoService {
                 .build());
 
         elegibilidadeService.reavaliarCasos(pessoa.getId());
+        casoEventoService.publicarNovos(pessoa.getId(), casosAntes);
         if (documento != null) {
             documentoService.marcarProcessado(documento.getId());
         }

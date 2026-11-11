@@ -16,6 +16,9 @@ public interface CasoRepository extends JpaRepository<Caso, Long>, JpaSpecificat
     /** Casos de um beneficiário, paginados. */
     Page<Caso> findByPessoaId(Long pessoaId, Pageable pageable);
 
+    /** Todos os casos de um beneficiário, para descobrir quais a regra PL/SQL acabou de abrir. */
+    List<Caso> findByPessoaIdOrderByIdAsc(Long pessoaId);
+
     /** Casos de todos os beneficiários de um responsável; é a lista "meus pedidos" do app. */
     Page<Caso> findByPessoaUsuarioId(Long usuarioId, Pageable pageable);
 

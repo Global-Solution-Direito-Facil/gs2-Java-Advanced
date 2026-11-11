@@ -44,7 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         // papel conferido aqui, antes da validação do corpo (os controllers repetem com @PreAuthorize)
-                        .requestMatchers("/api/v1/gestores/**").hasAuthority("GESTOR")
+                        .requestMatchers("/api/v1/gestores/**", "/api/v1/painel/**").hasAuthority("GESTOR")
                         .requestMatchers(HttpMethod.POST, "/api/v1/direitos", "/api/v1/laudos").hasAuthority("GESTOR")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/direitos/**", "/api/v1/casos/*/orientacao").hasAuthority("GESTOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/direitos/**").hasAuthority("GESTOR")
