@@ -46,11 +46,23 @@ public class DocumentosDotnetClient {
 
     /** Baixa o arquivo pelo GET /documentos/{id}/arquivo; 404 se a .NET não conhece o documento, 502 nas outras falhas. */
     public ArquivoBaixado baixarArquivo(String documentoId) {
+        return baixar(documentoId, tokenService.gerarServico().valor());
+    }
+
+    /**
+     * Baixa o arquivo com o token de quem está logado, em vez do SERVICO: a própria .NET confere
+     * se o documento é daquela pessoa. Documento de outro dono volta como 404.
+     */
+    public ArquivoBaixado baixarArquivoComoUsuario(String documentoId, String tokenDoUsuario) {
+        return baixar(documentoId, tokenDoUsuario);
+    }
+
+    private ArquivoBaixado baixar(String documentoId, String token) {
         exigirConfigurada();
         try {
             ResponseEntity<byte[]> resposta = restClient.get()
                     .uri(api.urlDocumentos() + "/{id}/arquivo", documentoId)
-                    .headers(this::autenticar)
+                    .headers(headers -> headers.setBearerAuth(token))
                     .retrieve()
                     .toEntity(byte[].class);
 
@@ -63,7 +75,8 @@ public class DocumentosDotnetClient {
             }
             return new ArquivoBaixado(conteudo, tipoMidia(resposta.getHeaders()), nomeArquivo(resposta.getHeaders(), documentoId));
         } catch (RestClientResponseException e) {
-            if (e.getStatusCode().value() == HttpStatus.NOT_FOUND.value()) {
+            int status = e.getStatusCode().value();
+            if (status == HttpStatus.NOT_FOUND.value() || status == HttpStatus.FORBIDDEN.value()) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Documento não encontrado na API de documentos.");
             }
             log.warn("API .NET respondeu {} ao baixar o documento {}", e.getStatusCode().value(), documentoId);

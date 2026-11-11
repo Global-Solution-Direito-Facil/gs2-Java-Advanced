@@ -101,6 +101,23 @@ class DocumentosDotnetClientTest {
     }
 
     @Test
+    void baixaComOTokenDoUsuarioSemTrocarPeloDeServico() {
+        cliente().baixarArquivoComoUsuario(DOCUMENTO, "token-da-ana");
+
+        assertThat(autorizacao.get()).isEqualTo("Bearer token-da-ana");
+        assertThat(caminho.get()).isEqualTo("/api/v1/documentos/" + DOCUMENTO + "/arquivo");
+    }
+
+    @Test
+    void documentoDeOutroDonoViraNotFound() {
+        statusResposta = 403;
+
+        assertThatThrownBy(() -> cliente().baixarArquivoComoUsuario(DOCUMENTO, "token-da-ana"))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        e -> assertThat(e.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
     void informaOStatusEmMaiusculasPeloPatch() {
         boolean informado = cliente().informarStatus(DOCUMENTO, StatusDocumentoDotnet.EXTRAIDO);
 

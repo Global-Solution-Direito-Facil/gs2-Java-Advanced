@@ -1,5 +1,6 @@
 package br.com.fiap.direitofacil.exception;
 
+import br.com.fiap.direitofacil.ia.IaLeituraException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +75,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErroResponse> handleResponseStatus(ResponseStatusException ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
         return build(status, status.getReasonPhrase(), ex.getReason(), request, List.of());
+    }
+
+    /** Leitura por IA: 503 quando a IA está sem chave ou fora do ar; 422 quando o arquivo não pôde ser lido. */
+    @ExceptionHandler(IaLeituraException.class)
+    public ResponseEntity<ErroResponse> handleIaLeitura(IaLeituraException ex, HttpServletRequest request) {
+        HttpStatus status = ex.isIndisponivel() ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.UNPROCESSABLE_ENTITY;
+        return build(status, status.getReasonPhrase(), ex.getMessage(), request, List.of());
     }
 
     @ExceptionHandler(AuthenticationException.class)

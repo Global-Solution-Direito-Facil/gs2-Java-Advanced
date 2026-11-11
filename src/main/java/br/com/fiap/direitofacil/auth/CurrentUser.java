@@ -30,6 +30,15 @@ public final class CurrentUser {
         return jwt == null ? null : jwt.getSubject();
     }
 
+    /** Token da requisição, para repassar à .NET em nome de quem está logado; 401 sem autenticação. */
+    public static String requireToken() {
+        Jwt jwt = jwt();
+        if (jwt == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado.");
+        }
+        return jwt.getTokenValue();
+    }
+
     /** Papel do token, ou null se não houver token ou a claim for desconhecida. */
     public static Role role() {
         Jwt jwt = jwt();
