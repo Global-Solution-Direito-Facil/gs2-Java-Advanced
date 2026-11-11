@@ -45,7 +45,8 @@ END PKG_AUDITORIA;
 CREATE OR REPLACE PACKAGE PKG_ELEGIBILIDADE IS
 
     FUNCTION FN_RENDA_PER_CAPITA_SM (
-        p_id_pessoa IN NUMBER
+        p_id_pessoa  IN NUMBER,
+        p_individual IN VARCHAR2 DEFAULT 'N'
     ) RETURN NUMBER;
 
     PROCEDURE PRC_AVALIAR_DIREITO (
@@ -67,21 +68,31 @@ CREATE OR REPLACE PACKAGE PKG_ELEGIBILIDADE IS
         p_dt_ref    IN DATE DEFAULT SYSDATE
     );
 
+    -- chamada pelo Java depois que a pessoa informa ou corrige a renda ou os laudos:
+    -- atualiza os casos ABERTO (POSSIVEL <-> ELEGIVEL), remove os ABERTO que deixaram de ser elegiveis
+    -- e abre os que passaram a ser. Casos em outros status nao sao tocados.
+    PROCEDURE PRC_REAVALIAR_CASOS (
+        p_id_pessoa IN NUMBER,
+        p_dt_ref    IN DATE DEFAULT SYSDATE
+    );
+
 END PKG_ELEGIBILIDADE;
 /
 
 CREATE OR REPLACE PACKAGE BODY PKG_ELEGIBILIDADE IS
 
 FUNCTION FN_RENDA_PER_CAPITA_SM (
-    p_id_pessoa IN NUMBER
+    p_id_pessoa  IN NUMBER,
+    p_individual IN VARCHAR2
 ) RETURN NUMBER
 IS
     v_renda    T_DF_PESSOA.VLR_RENDA_FAMILIAR%TYPE;
     v_membros  T_DF_PESSOA.QTD_MEMBROS_FAMILIA%TYPE;
+    v_indiv    T_DF_PESSOA.VLR_RENDA_INDIVIDUAL%TYPE;
     v_sm       T_DF_SALARIO_MINIMO.VLR_SALARIO_MINIMO%TYPE;
 BEGIN
-    SELECT VLR_RENDA_FAMILIAR, QTD_MEMBROS_FAMILIA
-    INTO v_renda, v_membros
+    SELECT VLR_RENDA_FAMILIAR, QTD_MEMBROS_FAMILIA, VLR_RENDA_INDIVIDUAL
+    INTO v_renda, v_membros, v_indiv
     FROM T_DF_PESSOA
     WHERE ID_PESSOA = p_id_pessoa;
 
@@ -89,6 +100,10 @@ BEGIN
     FROM T_DF_SALARIO_MINIMO
     WHERE ANO_REFERENCIA = (SELECT MAX(ANO_REFERENCIA) FROM T_DF_SALARIO_MINIMO);
 
+    -- 'S' = renda da propria pessoa (ex.: passe do idoso); 'N' = renda familiar por pessoa da familia
+    IF p_individual = 'S' THEN
+        RETURN ROUND(v_indiv / v_sm, 4);
+    END IF;
     RETURN ROUND((v_renda / v_membros) / v_sm, 4);
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
@@ -109,10 +124,12 @@ IS
     v_idade    NUMBER;
     v_pcd      NUMBER;
     v_tea      NUMBER;
+    v_tipo     NUMBER;
     v_fracao   NUMBER;
     v_crit     T_DF_CRITERIO_DIREITO%ROWTYPE;
     v_txt_f    VARCHAR2(10);
     v_txt_l    VARCHAR2(10);
+    v_rot      VARCHAR2(20);
 BEGIN
     SELECT DT_NASCIMENTO INTO v_dt_nasc
     FROM T_DF_PESSOA WHERE ID_PESSOA = p_id_pessoa;
@@ -131,7 +148,17 @@ BEGIN
     FROM T_DF_LAUDO
     WHERE ID_PESSOA = p_id_pessoa AND TIPO_CONDICAO = 'TEA';
 
-    v_fracao := FN_RENDA_PER_CAPITA_SM(p_id_pessoa);
+    -- alguns direitos exigem um tipo especifico de deficiencia (ex.: isencao de IOF = fisica)
+    IF v_crit.COD_TIPO_EXIGIDO IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_tipo
+        FROM T_DF_LAUDO
+        WHERE ID_PESSOA = p_id_pessoa AND TIPO_CONDICAO = v_crit.COD_TIPO_EXIGIDO;
+    ELSE
+        v_tipo := 1;
+    END IF;
+
+    v_fracao := FN_RENDA_PER_CAPITA_SM(p_id_pessoa, v_crit.STA_RENDA_INDIVIDUAL);
+    v_rot    := CASE WHEN v_crit.STA_RENDA_INDIVIDUAL = 'S' THEN 'Renda individual ' ELSE 'Renda per capita ' END;
     v_txt_f  := TO_CHAR(v_fracao, 'FM990D0000', 'NLS_NUMERIC_CHARACTERS=''.,''');
     v_txt_l  := TO_CHAR(v_crit.FRC_SM_MAX, 'FM990D0000', 'NLS_NUMERIC_CHARACTERS=''.,''');
 
@@ -145,19 +172,25 @@ BEGIN
     ELSIF v_crit.STA_EXIGE_PCD = 'S' AND v_pcd = 0 THEN
         p_status := 'NAO_ELEGIVEL';
         p_motivo := 'Exige laudo de deficiencia (PcD)';
+    ELSIF v_tipo = 0 THEN
+        p_status := 'NAO_ELEGIVEL';
+        p_motivo := 'Exige laudo de deficiencia do tipo ' || v_crit.COD_TIPO_EXIGIDO;
+    ELSIF v_crit.STA_RENDA_INDIVIDUAL = 'S' AND v_crit.FRC_SM_MAX IS NOT NULL AND v_fracao IS NULL THEN
+        p_status := 'POSSIVEL';
+        p_motivo := 'Informe a renda individual';
     ELSIF v_crit.FRC_SM_MAX IS NULL THEN
         p_status := 'ELEGIVEL';
         p_motivo := 'Criterios atendidos (sem limite de renda)';
     ELSIF v_fracao <= v_crit.FRC_SM_MAX THEN
         p_status := 'ELEGIVEL';
-        p_motivo := 'Renda per capita ' || v_txt_f || ' SM dentro do limite de ' || v_txt_l || ' SM';
+        p_motivo := v_rot || v_txt_f || ' SM dentro do limite de ' || v_txt_l || ' SM';
     ELSIF v_fracao <= v_crit.FRC_SM_MAX * (1 + v_crit.PCT_TOLERANCIA / 100) THEN
         p_status := 'POSSIVEL';
-        p_motivo := 'Renda per capita ' || v_txt_f || ' SM proxima do limite de ' || v_txt_l
+        p_motivo := v_rot || v_txt_f || ' SM proxima do limite de ' || v_txt_l
                     || ' SM; confirmar renda no CadUnico';
     ELSE
         p_status := 'NAO_ELEGIVEL';
-        p_motivo := 'Renda per capita ' || v_txt_f || ' SM acima do limite de ' || v_txt_l || ' SM';
+        p_motivo := v_rot || v_txt_f || ' SM acima do limite de ' || v_txt_l || ' SM';
     END IF;
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
@@ -229,6 +262,51 @@ EXCEPTION
         VALUES ('PRC_ABRIR_CASOS', v_codigo, v_erro, SYSDATE, USER);
         DBMS_OUTPUT.PUT_LINE('Erro [' || v_codigo || ']: ' || v_erro);
 END PRC_ABRIR_CASOS;
+
+PROCEDURE PRC_REAVALIAR_CASOS (
+    p_id_pessoa IN NUMBER,
+    p_dt_ref    IN DATE
+)
+IS
+    v_status      VARCHAR2(15);
+    v_motivo      VARCHAR2(300);
+    v_atualizados NUMBER := 0;
+    v_removidos   NUMBER := 0;
+    v_erro        VARCHAR2(4000);
+    v_codigo      NUMBER;
+BEGIN
+    FOR r IN (SELECT ID_CASO, ID_DIREITO, RESULTADO_AVALIACAO, DES_MOTIVO
+              FROM T_DF_CASO
+              WHERE ID_PESSOA = p_id_pessoa AND STATUS = 'ABERTO'
+              ORDER BY ID_CASO) LOOP
+        PRC_AVALIAR_DIREITO(p_id_pessoa, r.ID_DIREITO, p_dt_ref, v_status, v_motivo);
+
+        IF v_status = 'NAO_ELEGIVEL' THEN
+            -- a orientacao da IA (1:1) some junto com o caso; o gatilho de auditoria registra o DELETE
+            DELETE FROM T_DF_ORIENTACAO WHERE ID_CASO = r.ID_CASO;
+            DELETE FROM T_DF_CASO WHERE ID_CASO = r.ID_CASO;
+            v_removidos := v_removidos + 1;
+        ELSIF v_status <> r.RESULTADO_AVALIACAO OR v_motivo <> r.DES_MOTIVO THEN
+            UPDATE T_DF_CASO
+            SET RESULTADO_AVALIACAO = v_status,
+                DES_MOTIVO = v_motivo,
+                DT_ATUALIZACAO = p_dt_ref
+            WHERE ID_CASO = r.ID_CASO;
+            v_atualizados := v_atualizados + 1;
+        END IF;
+    END LOOP;
+
+    PRC_ABRIR_CASOS(p_id_pessoa, p_dt_ref);
+    DBMS_OUTPUT.PUT_LINE('Pessoa ' || p_id_pessoa || ': ' || v_atualizados || ' caso(s) atualizado(s), '
+                         || v_removidos || ' removido(s)');
+EXCEPTION
+    WHEN OTHERS THEN
+        v_codigo := SQLCODE;
+        v_erro   := SQLERRM;
+        INSERT INTO T_DF_LOG_ERRO (NOME_PROCEDURE, CODIGO_ERRO, MENSAGEM_ERRO, DATA_ERRO, USUARIO_BANCO)
+        VALUES ('PRC_REAVALIAR_CASOS', v_codigo, v_erro, SYSDATE, USER);
+        RAISE;
+END PRC_REAVALIAR_CASOS;
 
 END PKG_ELEGIBILIDADE;
 /
@@ -446,6 +524,209 @@ BEGIN
 END PRC_REL_CASOS_POR_STATUS;
 
 END PKG_CASOS;
+/
+
+------------------------------------------------------------
+-- PACKAGE: PKG_FARMACIA_POPULAR
+-- Consulta de remedios no elenco do Farmacia Popular (a tabela decide; a IA so le a receita).
+-- Fluxo: IA le a foto -> pessoa confere na tela -> Java chama PRC_ADICIONAR_ITEM com o que foi conferido.
+------------------------------------------------------------
+CREATE OR REPLACE PACKAGE PKG_FARMACIA_POPULAR IS
+
+    FUNCTION FN_CONSULTAR_ITEM (
+        p_principio    IN VARCHAR2,
+        p_concentracao IN VARCHAR2
+    ) RETURN VARCHAR2;
+
+    PROCEDURE PRC_REGISTRAR_RECEITA (
+        p_id_pessoa    IN  NUMBER,
+        p_id_documento IN  NUMBER,
+        p_id_receita   OUT NUMBER
+    );
+
+    PROCEDURE PRC_ADICIONAR_ITEM (
+        p_id_receita   IN NUMBER,
+        p_nome_lido    IN VARCHAR2,
+        p_principio    IN VARCHAR2,
+        p_concentracao IN VARCHAR2,
+        p_corrigido    IN VARCHAR2 DEFAULT 'N'
+    );
+
+    PROCEDURE PRC_REL_RECEITA (
+        p_id_receita IN NUMBER
+    );
+
+END PKG_FARMACIA_POPULAR;
+/
+
+CREATE OR REPLACE PACKAGE BODY PKG_FARMACIA_POPULAR IS
+
+-- minusculas, sem acento (UNISTR mantem o script em ASCII) e sem espacos repetidos
+FUNCTION F_NORM (p IN VARCHAR2) RETURN VARCHAR2
+IS
+BEGIN
+    RETURN TRIM(REGEXP_REPLACE(
+        TRANSLATE(LOWER(p),
+                  UNISTR('\00E1\00E0\00E2\00E3\00E4\00E9\00E8\00EA\00EB\00ED\00EC\00EE\00EF\00F3\00F2\00F4\00F5\00F6\00FA\00F9\00FB\00FC\00E7'),
+                  'aaaaaeeeeiiiiooooouuuuc'),
+        '[[:space:]]+', ' '));
+END F_NORM;
+
+-- o principio ativo digitado precisa estar contido no nome do elenco (ex.: "metformina" acha "cloridrato de metformina");
+-- a concentracao precisa ser igual (ignorando espacos e tratando virgula e ponto como o mesmo separador: 2,5mg = 2.5 mg); principio achado com outra dosagem = DOSAGEM_DIVERGENTE
+PROCEDURE P_AVALIAR (
+    p_principio    IN  VARCHAR2,
+    p_concentracao IN  VARCHAR2,
+    p_resultado    OUT VARCHAR2,
+    p_id_med       OUT NUMBER
+)
+IS
+    v_p      VARCHAR2(200) := F_NORM(p_principio);
+    v_c      VARCHAR2(100) := REPLACE(REPLACE(F_NORM(p_concentracao), ' ', ''), ',', '.');
+    v_achou  BOOLEAN := FALSE;
+BEGIN
+    p_resultado := 'NAO_ENCONTRADO';
+    p_id_med    := NULL;
+    IF v_p IS NULL OR LENGTH(v_p) < 4 THEN
+        RETURN;
+    END IF;
+
+    FOR r IN (SELECT ID_MEDICAMENTO, DES_PRINCIPIO_ATIVO, DES_CONCENTRACAO
+              FROM T_DF_MEDICAMENTO_FP
+              WHERE TIPO_ITEM = 'MEDICAMENTO' AND STA_GRATUITO = 'S'
+              ORDER BY ID_MEDICAMENTO) LOOP
+        IF INSTR(F_NORM(r.DES_PRINCIPIO_ATIVO), v_p) > 0 THEN
+            IF NOT v_achou THEN
+                v_achou     := TRUE;
+                p_resultado := 'DOSAGEM_DIVERGENTE';
+                p_id_med    := r.ID_MEDICAMENTO;
+            END IF;
+            IF REPLACE(REPLACE(F_NORM(r.DES_CONCENTRACAO), ' ', ''), ',', '.') = v_c THEN
+                p_resultado := 'GRATUITO';
+                p_id_med    := r.ID_MEDICAMENTO;
+                RETURN;
+            END IF;
+        END IF;
+    END LOOP;
+END P_AVALIAR;
+
+FUNCTION FN_CONSULTAR_ITEM (
+    p_principio    IN VARCHAR2,
+    p_concentracao IN VARCHAR2
+) RETURN VARCHAR2
+IS
+    v_res  VARCHAR2(20);
+    v_id   NUMBER;
+BEGIN
+    P_AVALIAR(p_principio, p_concentracao, v_res, v_id);
+    RETURN v_res;
+END FN_CONSULTAR_ITEM;
+
+PROCEDURE PRC_REGISTRAR_RECEITA (
+    p_id_pessoa    IN  NUMBER,
+    p_id_documento IN  NUMBER,
+    p_id_receita   OUT NUMBER
+)
+IS
+    v_qtd     NUMBER;
+    v_erro    VARCHAR2(4000);
+    v_codigo  NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_qtd FROM T_DF_PESSOA WHERE ID_PESSOA = p_id_pessoa;
+    IF v_qtd = 0 THEN
+        RAISE_APPLICATION_ERROR(-20060, 'PRC_REGISTRAR_RECEITA: pessoa ' || p_id_pessoa || ' nao encontrada');
+    END IF;
+
+    INSERT INTO T_DF_RECEITA (ID_PESSOA, ID_DOCUMENTO)
+    VALUES (p_id_pessoa, p_id_documento)
+    RETURNING ID_RECEITA INTO p_id_receita;
+
+    DBMS_OUTPUT.PUT_LINE('Receita ' || p_id_receita || ' registrada');
+EXCEPTION
+    WHEN OTHERS THEN
+        v_codigo := SQLCODE;
+        v_erro   := SQLERRM;
+        INSERT INTO T_DF_LOG_ERRO (NOME_PROCEDURE, CODIGO_ERRO, MENSAGEM_ERRO, DATA_ERRO, USUARIO_BANCO)
+        VALUES ('PRC_REGISTRAR_RECEITA', v_codigo, v_erro, SYSDATE, USER);
+        RAISE;
+END PRC_REGISTRAR_RECEITA;
+
+PROCEDURE PRC_ADICIONAR_ITEM (
+    p_id_receita   IN NUMBER,
+    p_nome_lido    IN VARCHAR2,
+    p_principio    IN VARCHAR2,
+    p_concentracao IN VARCHAR2,
+    p_corrigido    IN VARCHAR2 DEFAULT 'N'
+)
+IS
+    v_qtd     NUMBER;
+    v_res     VARCHAR2(20);
+    v_id_med  NUMBER;
+    v_orient  VARCHAR2(400);
+    v_erro    VARCHAR2(4000);
+    v_codigo  NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_qtd FROM T_DF_RECEITA WHERE ID_RECEITA = p_id_receita;
+    IF v_qtd = 0 THEN
+        RAISE_APPLICATION_ERROR(-20061, 'PRC_ADICIONAR_ITEM: receita ' || p_id_receita || ' nao encontrada');
+    END IF;
+
+    P_AVALIAR(p_principio, p_concentracao, v_res, v_id_med);
+
+    -- o app nunca sugere trocar de remedio: so informa e manda confirmar na farmacia
+    IF v_res = 'GRATUITO' THEN
+        v_orient := 'Gratuito no Farmacia Popular. Leve a receita valida e um documento oficial com foto e CPF a uma farmacia credenciada (selo "Aqui tem Farmacia Popular").';
+    ELSIF v_res = 'DOSAGEM_DIVERGENTE' THEN
+        v_orient := 'O principio ativo esta no elenco, mas a dosagem da receita nao. Confirme na farmacia credenciada. Nao troque o remedio por conta propria.';
+    ELSE
+        v_orient := 'Nao consta no elenco gratuito do Farmacia Popular. Pergunte na farmacia ou na unidade de saude.';
+    END IF;
+
+    INSERT INTO T_DF_RECEITA_ITEM (ID_RECEITA, DES_NOME_LIDO, DES_PRINCIPIO_ATIVO, DES_CONCENTRACAO,
+                                   STA_CORRIGIDO, RESULTADO, ID_MEDICAMENTO, DES_ORIENTACAO)
+    VALUES (p_id_receita, p_nome_lido, p_principio, p_concentracao,
+            UPPER(p_corrigido), v_res, v_id_med, v_orient);
+EXCEPTION
+    WHEN OTHERS THEN
+        v_codigo := SQLCODE;
+        v_erro   := SQLERRM;
+        INSERT INTO T_DF_LOG_ERRO (NOME_PROCEDURE, CODIGO_ERRO, MENSAGEM_ERRO, DATA_ERRO, USUARIO_BANCO)
+        VALUES ('PRC_ADICIONAR_ITEM', v_codigo, v_erro, SYSDATE, USER);
+        RAISE;
+END PRC_ADICIONAR_ITEM;
+
+PROCEDURE PRC_REL_RECEITA (
+    p_id_receita IN NUMBER
+)
+IS
+    v_nome   T_DF_PESSOA.NOME%TYPE;
+    v_grat   NUMBER := 0;
+    v_total  NUMBER := 0;
+BEGIN
+    BEGIN
+        SELECT p.NOME INTO v_nome
+        FROM T_DF_RECEITA r JOIN T_DF_PESSOA p ON p.ID_PESSOA = r.ID_PESSOA
+        WHERE r.ID_RECEITA = p_id_receita;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20061, 'PRC_REL_RECEITA: receita ' || p_id_receita || ' nao encontrada');
+    END;
+
+    DBMS_OUTPUT.PUT_LINE('=== RECEITA ' || p_id_receita || ' - ' || v_nome || ' ===');
+    FOR r IN (SELECT DES_PRINCIPIO_ATIVO, DES_CONCENTRACAO, RESULTADO
+              FROM T_DF_RECEITA_ITEM
+              WHERE ID_RECEITA = p_id_receita
+              ORDER BY ID_ITEM) LOOP
+        DBMS_OUTPUT.PUT_LINE(RPAD(r.DES_PRINCIPIO_ATIVO || ' ' || r.DES_CONCENTRACAO, 32) || r.RESULTADO);
+        v_total := v_total + 1;
+        IF r.RESULTADO = 'GRATUITO' THEN
+            v_grat := v_grat + 1;
+        END IF;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('Gratuitos: ' || v_grat || ' de ' || v_total || ' (confirme sempre na farmacia credenciada)');
+END PRC_REL_RECEITA;
+
+END PKG_FARMACIA_POPULAR;
 /
 
 ------------------------------------------------------------

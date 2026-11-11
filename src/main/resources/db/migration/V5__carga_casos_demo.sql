@@ -1,7 +1,7 @@
 -- Flyway V5: abre os casos da demo (data de referencia 05/11/2026) e simula o andamento
 
 ------------------------------------------------------------
--- CARGA DOS CASOS: avalia as 15 regras para cada pessoa e abre um caso
+-- CARGA DOS CASOS: avalia as 20 regras para cada pessoa e abre um caso
 -- para cada direito ELEGIVEL ou POSSIVEL (data de referencia fixa)
 ------------------------------------------------------------
 BEGIN
