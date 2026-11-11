@@ -7,8 +7,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.function.Function;
+
 /** Lê role e id do usuário do JWT autenticado; sem token válido, nega em vez de liberar. */
 public final class CurrentUser {
+
+    private static volatile Function<String, Long> buscaPorEmail;
 
     private CurrentUser() {}
 
@@ -52,7 +56,10 @@ public final class CurrentUser {
         return role() == Role.CIDADAO;
     }
 
-    /** Id do usuário do token, ou null sem autenticação. */
+    /**
+     * Id do usuário do token, ou null sem autenticação. O token da .NET não traz a claim
+     * "usuarioId": nesse caso o id vem da conta com o mesmo e-mail do sub.
+     */
     public static Long usuarioId() {
         Jwt jwt = jwt();
         if (jwt == null) {
@@ -69,7 +76,15 @@ public final class CurrentUser {
                 return null;
             }
         }
+        if (valor == null && buscaPorEmail != null && jwt.getSubject() != null) {
+            return buscaPorEmail.apply(jwt.getSubject());
+        }
         return null;
+    }
+
+    /** Ligado na subida pelo UsuarioPorEmail, que tem acesso ao repositório. */
+    static void usarBuscaPorEmail(Function<String, Long> busca) {
+        buscaPorEmail = busca;
     }
 
     /** Id do usuário do token, ou 401 se não houver; usado em todo filtro por dono. */

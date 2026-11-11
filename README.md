@@ -125,7 +125,8 @@ src/main/resources/
 A API usa **Spring Security** com autenticação **JWT** e senhas em **BCrypt**.
 
 - O token é assinado com **HS256** e a chave da variável `JWT_SECRET`, usada como **texto UTF-8** (sem decodificar Base64). É a mesma chave da API .NET, que valida o mesmo token.
-- Claims: `sub` = e-mail, `role` = `CIDADAO` ou `GESTOR` (sem o prefixo `ROLE_`), `usuarioId` e `nome`.
+- Claims: `iss` = `direitofacil`, `aud` = `direitofacil-app`, `sub` = e-mail, `email`, `role` = `CIDADAO` ou `GESTOR` (sem o prefixo `ROLE_`), `usuarioId` e `nome`. O token vale 8 horas.
+- O token emitido pela .NET (sem `usuarioId`) também é aceito: a conta é localizada pelo e-mail do `sub`.
 - O papel é lido da claim `role` e conferido no filtro de segurança e nos controllers com `@PreAuthorize`.
 - Sem token, com token inválido ou expirado: **401**. Papel errado: **403**. Os dois devolvem o mesmo corpo de erro da API.
 
@@ -252,8 +253,8 @@ O Flyway cria as tabelas, os pacotes PL/SQL e os dados de demonstração na prim
 | `DB_USERNAME` | sim | seu usuário (RM) |
 | `DB_PASSWORD` | sim | sua senha |
 | `JWT_SECRET` | sim | chave com **pelo menos 32 caracteres**; a mesma da API .NET |
-| `JWT_EXPIRATION_MINUTES` | não | `60` |
-| `JWT_ISSUER` | não | vazio |
+| `JWT_EXPIRATION_MINUTES` | não | `480` (8 horas) |
+| `JWT_ISSUER` / `JWT_AUDIENCE` | não | `direitofacil` / `direitofacil-app` (iguais aos da .NET) |
 | `RABBITMQ_HOST` / `RABBITMQ_PORT` | não | `localhost` / `5672` |
 | `RABBITMQ_USERNAME` / `RABBITMQ_PASSWORD` | não | `myuser` / `secret` (iguais ao `docker-compose.yml`) |
 | `RABBITMQ_VHOST` / `RABBITMQ_SSL` | não | `/` / `false` |
@@ -458,7 +459,7 @@ Quem decide é a tabela `T_DF_MEDICAMENTO_FP`, com o elenco oficial de 41 itens 
 # 📱 Integração com o Mobile e a .NET
 
 - **App Mobile:** faz login só nesta API (`POST /api/v1/auth/login`) e consome as rotas `/api/v1/...`. As listagens são paginadas (`content`, `page`, `size`, `totalElements`, `totalPages`).
-- **API .NET (documentos e envios):** tem banco próprio. Aceita o token emitido por esta API: HS256, mesma `JWT_SECRET`, `sub` = e-mail, `role` sem prefixo. O e-mail liga os documentos à pessoa.
+- **API .NET (documentos e envios):** tem banco próprio. Aceita o token emitido por esta API: HS256, mesma `JWT_SECRET`, mesmos `iss` e `aud`, `sub` = e-mail, `role` sem prefixo. O e-mail liga os documentos à pessoa.
 - **Evento `DocumentoRecebido`:** publicado pela .NET quando o arquivo chega. O consumidor no Java será ligado quando o formato da mensagem for fechado com a .NET. Até lá, o registro do documento é feito por `POST /api/v1/documentos`.
 
 ---
@@ -499,7 +500,7 @@ O repositório tem a coleção `DireitoFacil-Insomnia.json`, com 57 requisiçõe
 
 1. No Insomnia: `Import → File → DireitoFacil-Insomnia.json`.
 2. No `Base Environment`, confira `base_url` (`http://localhost:8080`).
-3. Rode `00 - Auth` e copie os tokens para `token_gestor`, `token_cidadao` (Ana) e `token_cidadao_helena` (Paula). Eles valem 60 minutos.
+3. Rode `00 - Auth` e copie os tokens para `token_gestor`, `token_cidadao` (Ana) e `token_cidadao_helena` (Paula). Eles valem 8 horas.
 4. Nas requisições que criam algo (direito de teste, pessoa nova, documento, receita), copie o `id` devolvido para a variável indicada na descrição.
 
 As variáveis já vêm com os ids de um banco recém-criado pelo Flyway. Cada requisição diz na descrição o status esperado.

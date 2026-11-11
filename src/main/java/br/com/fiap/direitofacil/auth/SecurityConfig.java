@@ -12,8 +12,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -23,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.List;
 
 /**
  * Segurança da API (mesma base do PetPulse): stateless, JWT validado pelo resource server
@@ -66,9 +70,14 @@ public class SecurityConfig {
 
     @Bean
     JwtDecoder jwtDecoder(JwtProperties jwt) {
-        return NimbusJwtDecoder.withSecretKey(chave(jwt))
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(chave(jwt))
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                JwtValidators.createDefaultWithIssuer(jwt.issuer()),
+                new JwtClaimValidator<List<String>>("aud", aud -> aud != null && aud.contains(jwt.audience()))
+        ));
+        return decoder;
     }
 
     @Bean

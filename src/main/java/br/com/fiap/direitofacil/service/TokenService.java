@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /**
- * Gera o JWT no formato combinado com a .NET: HS256, sub = e-mail e claim "role" com
- * CIDADAO ou GESTOR (sem ROLE_). A claim "usuarioId" é lida pelo CurrentUser deste projeto.
+ * Gera o JWT no formato combinado com a .NET: HS256, issuer e audience iguais nas duas APIs,
+ * sub = e-mail, claims "email" e "role" (CIDADAO ou GESTOR, sem ROLE_). As claims "usuarioId"
+ * e "nome" são extras deste projeto; a .NET ignora.
  */
 @Service
 @RequiredArgsConstructor
@@ -27,23 +29,23 @@ public class TokenService {
     public record Token(String valor, Instant expiraEm) {}
 
     public Token gerar(Usuario usuario) {
-        // o JWT guarda iat/exp em segundos; truncar deixa o expiraEm da resposta igual ao do token
         Instant agora = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         Instant expiraEm = agora.plus(jwt.expiracaoMinutos(), ChronoUnit.MINUTES);
 
-        JwtClaimsSet.Builder claims = JwtClaimsSet.builder()
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(jwt.issuer())
+                .audience(List.of(jwt.audience()))
                 .issuedAt(agora)
                 .expiresAt(expiraEm)
                 .subject(usuario.getEmail())
+                .claim("email", usuario.getEmail())
                 .claim("role", usuario.getPerfil().name())
                 .claim("usuarioId", usuario.getId())
-                .claim("nome", usuario.getNome());
-        if (jwt.issuer() != null && !jwt.issuer().isBlank()) {
-            claims.issuer(jwt.issuer());
-        }
+                .claim("nome", usuario.getNome())
+                .build();
 
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).type("JWT").build();
-        String valor = encoder.encode(JwtEncoderParameters.from(header, claims.build())).getTokenValue();
+        String valor = encoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
         return new Token(valor, expiraEm);
     }
 }
