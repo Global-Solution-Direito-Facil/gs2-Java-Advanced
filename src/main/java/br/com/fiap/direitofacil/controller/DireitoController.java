@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -46,18 +47,21 @@ public class DireitoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('GESTOR')")
     @Operation(summary = "Criar direito", description = "Exclusivo do gestor; cria o direito e o critério de elegibilidade.")
     public ResponseEntity<DireitoResponse> criar(@RequestBody @Valid DireitoRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(request));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('GESTOR')")
     @Operation(summary = "Atualizar direito", description = "Exclusivo do gestor; atualiza o direito e o critério.")
     public DireitoResponse atualizar(@PathVariable Long id, @RequestBody @Valid DireitoRequest request) {
         return service.atualizar(id, request);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('GESTOR')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir direito", description = "Exclusivo do gestor; devolve 409 se já houver casos ligados ao direito.")
     public void deletar(@PathVariable Long id) {

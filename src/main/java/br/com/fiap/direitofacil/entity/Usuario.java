@@ -1,8 +1,6 @@
 package br.com.fiap.direitofacil.entity;
 
 import br.com.fiap.direitofacil.enums.Role;
-import br.com.fiap.direitofacil.validation.Cpf;
-import br.com.fiap.direitofacil.validation.EmailValido;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -37,14 +35,13 @@ public class Usuario {
     @Column(name = "NOME", nullable = false, length = 150)
     private String nome;
 
+    /** O formato e os dígitos do CPF são validados na entrada (UsuarioRequest); a carga de demonstração usa CPFs fictícios. */
     @NotBlank
-    @Cpf
     @Size(max = 14)
     @Column(name = "CPF", nullable = false, unique = true, length = 14)
     private String cpf;
 
     @NotBlank
-    @EmailValido
     @Size(max = 150)
     @Column(name = "EMAIL", nullable = false, unique = true, length = 150)
     private String email;

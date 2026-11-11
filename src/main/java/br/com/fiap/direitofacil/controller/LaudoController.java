@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,6 +27,7 @@ public class LaudoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('GESTOR')")
     @Operation(summary = "Registrar laudo",
             description = "Exclusivo do gestor. Grava o laudo estruturado e dispara a PKG_ELEGIBILIDADE.PRC_REAVALIAR_CASOS, que atualiza os casos ABERTO e abre um caso para cada direito ELEGIVEL ou POSSIVEL da pessoa.")
     public ResponseEntity<LaudoResponse> registrar(@RequestBody @Valid LaudoRequest request) {

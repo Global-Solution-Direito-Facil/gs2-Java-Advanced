@@ -31,7 +31,7 @@ public class SwaggerConfig {
                                 .bearerFormat("JWT")
                                 .in(SecurityScheme.In.HEADER)
                                 .name("Authorization")
-                                .description("Token devolvido por /auth/login.")))
+                                .description("Token devolvido por POST /api/v1/auth/login.")))
                 .addSecurityItem(new SecurityRequirement().addList(ESQUEMA_JWT));
     }
 }

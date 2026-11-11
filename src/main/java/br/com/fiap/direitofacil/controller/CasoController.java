@@ -17,6 +17,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,6 +41,7 @@ public class CasoController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasAuthority('CIDADAO')")
     @Operation(summary = "Meus casos", description = "Casos de todos os beneficiários do cidadão logado.")
     public PageResponse<CasoResponse> meusCasos(
             @ParameterObject @PageableDefault(size = 10, sort = "dataPrazo", direction = Sort.Direction.ASC) Pageable pageable) {
@@ -53,6 +55,7 @@ public class CasoController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('GESTOR')")
     @Operation(summary = "Atualizar status do caso",
             description = "Exclusivo do gestor. Passa pela PKG_CASOS: o gatilho do banco valida o fluxo (PROTOCOLADO só vai para CONCEDIDO ou NEGADO; estados finais não mudam) e grava a auditoria.")
     public CasoResponse atualizarStatus(@PathVariable Long id, @RequestBody @Valid AtualizarStatusCasoRequest request) {
@@ -66,6 +69,7 @@ public class CasoController {
     }
 
     @PutMapping("/{id}/orientacao")
+    @PreAuthorize("hasAuthority('GESTOR')")
     @Operation(summary = "Registrar orientação", description = "Exclusivo do gestor. Grava ou substitui o passo a passo do caso.")
     public OrientacaoResponse registrarOrientacao(@PathVariable Long id, @RequestBody @Valid RegistrarOrientacaoRequest request) {
         return orientacaoService.registrar(id, request);
