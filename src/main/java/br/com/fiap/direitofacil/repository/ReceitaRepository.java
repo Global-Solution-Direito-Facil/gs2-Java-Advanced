@@ -13,4 +13,10 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long> {
 
     /** Receitas de todos os beneficiários de um responsável, para o cidadão ver as suas. */
     Page<Receita> findByPessoaUsuarioId(Long usuarioId, Pageable pageable);
+
+    /** Documento usado como foto de receita não pode ser removido. */
+    boolean existsByDocumentoId(Long documentoId);
+
+    /** Remove as receitas da pessoa (depois dos itens). */
+    void deleteByPessoaId(Long pessoaId);
 }

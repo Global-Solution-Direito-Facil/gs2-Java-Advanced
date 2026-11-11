@@ -38,6 +38,13 @@ public class DocumentoController {
         return service.buscarPorId(id);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Excluir documento", description = "Dono ou gestor. Devolve 409 se o documento já virou laudo ou receita.")
+    public void deletar(@PathVariable Long id) {
+        service.deletar(id);
+    }
+
     @PostMapping
     @Operation(summary = "Registrar documento",
             description = "Registra os metadados de um laudo recebido. Reenvio com a mesma chave de idempotência devolve o registro já existente.")

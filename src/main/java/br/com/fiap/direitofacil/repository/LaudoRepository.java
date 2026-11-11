@@ -14,4 +14,10 @@ public interface LaudoRepository extends JpaRepository<Laudo, Long> {
 
     /** Laudo gerado a partir de um documento, para não extrair duas vezes. */
     Optional<Laudo> findByDocumentoId(Long documentoId);
+
+    /** Documento que já virou laudo não pode ser removido. */
+    boolean existsByDocumentoId(Long documentoId);
+
+    /** Remove os laudos da pessoa (antes dos documentos, que eles referenciam). */
+    void deleteByPessoaId(Long pessoaId);
 }

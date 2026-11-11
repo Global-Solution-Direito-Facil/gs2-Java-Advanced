@@ -3,6 +3,7 @@ package br.com.fiap.direitofacil.controller;
 import br.com.fiap.direitofacil.dto.request.AtualizarStatusCasoRequest;
 import br.com.fiap.direitofacil.dto.request.RegistrarOrientacaoRequest;
 import br.com.fiap.direitofacil.dto.response.CasoResponse;
+import br.com.fiap.direitofacil.dto.response.HistoricoCasoResponse;
 import br.com.fiap.direitofacil.dto.response.OrientacaoResponse;
 import br.com.fiap.direitofacil.dto.response.PageResponse;
 import br.com.fiap.direitofacil.enums.ResultadoElegibilidade;
@@ -19,6 +20,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/casos")
@@ -52,6 +55,13 @@ public class CasoController {
     @Operation(summary = "Buscar caso por ID")
     public CasoResponse buscarPorId(@PathVariable Long id) {
         return service.buscarPorId(id);
+    }
+
+    @GetMapping("/{id}/historico")
+    @Operation(summary = "Histórico do caso",
+            description = "Abertura e cada mudança de status, lidas da auditoria gravada pelo gatilho TRG_DF_AUDITORIA_CASO.")
+    public List<HistoricoCasoResponse> historico(@PathVariable Long id) {
+        return service.historico(id);
     }
 
     @PatchMapping("/{id}/status")

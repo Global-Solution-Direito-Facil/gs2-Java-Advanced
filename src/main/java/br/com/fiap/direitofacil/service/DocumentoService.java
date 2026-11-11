@@ -7,6 +7,8 @@ import br.com.fiap.direitofacil.entity.Documento;
 import br.com.fiap.direitofacil.entity.Pessoa;
 import br.com.fiap.direitofacil.enums.StatusDocumento;
 import br.com.fiap.direitofacil.repository.DocumentoRepository;
+import br.com.fiap.direitofacil.repository.LaudoRepository;
+import br.com.fiap.direitofacil.repository.ReceitaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,8 @@ public class DocumentoService {
 
     private final DocumentoRepository repository;
     private final PessoaService pessoaService;
+    private final LaudoRepository laudoRepository;
+    private final ReceitaRepository receitaRepository;
 
     @Transactional(readOnly = true)
     public Page<DocumentoResponse> listar(Long pessoaId, Pageable pageable) {
@@ -67,6 +71,17 @@ public class DocumentoService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Documento já registrado."));
             return DtoMapper.toResponse(conferirDono(concorrente, pessoa));
         }
+    }
+
+    /** Remove o registro do documento (dono ou gestor); 409 se ele já virou laudo ou receita. */
+    @Transactional
+    public void deletar(Long id) {
+        Documento documento = findEntityByIdAutorizado(id);
+        if (laudoRepository.existsByDocumentoId(id) || receitaRepository.existsByDocumentoId(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "O documento já foi usado em um laudo ou receita e não pode ser removido.");
+        }
+        repository.delete(documento);
     }
 
     /** Marca o documento como PROCESSADO depois da extração do laudo. */

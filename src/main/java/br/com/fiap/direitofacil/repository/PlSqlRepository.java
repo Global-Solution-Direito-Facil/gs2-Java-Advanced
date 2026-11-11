@@ -25,6 +25,9 @@ public class PlSqlRepository {
     private final SimpleJdbcCall reavaliarCasos;
     private final SimpleJdbcCall atualizarStatusCaso;
     private final SimpleJdbcCall registrarOrientacao;
+    private final SimpleJdbcCall registrarReceita;
+    private final SimpleJdbcCall adicionarItemReceita;
+    private final SimpleJdbcCall consultarFarmaciaPopular;
 
     public PlSqlRepository(DataSource dataSource) {
         this.avaliarDireito = new SimpleJdbcCall(dataSource)
@@ -50,6 +53,18 @@ public class PlSqlRepository {
         this.registrarOrientacao = new SimpleJdbcCall(dataSource)
                 .withCatalogName("PKG_CASOS")
                 .withProcedureName("PRC_REGISTRAR_ORIENTACAO");
+
+        this.registrarReceita = new SimpleJdbcCall(dataSource)
+                .withCatalogName("PKG_FARMACIA_POPULAR")
+                .withProcedureName("PRC_REGISTRAR_RECEITA");
+
+        this.adicionarItemReceita = new SimpleJdbcCall(dataSource)
+                .withCatalogName("PKG_FARMACIA_POPULAR")
+                .withProcedureName("PRC_ADICIONAR_ITEM");
+
+        this.consultarFarmaciaPopular = new SimpleJdbcCall(dataSource)
+                .withCatalogName("PKG_FARMACIA_POPULAR")
+                .withFunctionName("FN_CONSULTAR_ITEM");
     }
 
     /** Avalia um direito para uma pessoa e devolve resultado e motivo, inclusive NAO_ELEGIVEL. */
@@ -111,5 +126,37 @@ public class PlSqlRepository {
         parametros.put("P_FONTE", fonte);
         parametros.put("P_MODELO", modelo);
         registrarOrientacao.execute(parametros);
+    }
+
+    /** Cria a receita da pessoa (documento opcional, a foto fica na .NET) e devolve o id gerado. */
+    public Long registrarReceita(Long pessoaId, Long documentoId) {
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("P_ID_PESSOA", pessoaId);
+        parametros.put("P_ID_DOCUMENTO", documentoId);
+        Map<String, Object> saida = registrarReceita.execute(parametros);
+        return ((Number) saida.get("P_ID_RECEITA")).longValue();
+    }
+
+    /**
+     * Grava um remédio já conferido pela pessoa; o pacote compara com o elenco e decide
+     * GRATUITO, DOSAGEM_DIVERGENTE ou NAO_ENCONTRADO, com a orientação.
+     */
+    public void adicionarItemReceita(Long receitaId, String nomeLido, String principioAtivo,
+                                     String concentracao, boolean corrigido) {
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("P_ID_RECEITA", receitaId);
+        parametros.put("P_NOME_LIDO", nomeLido);
+        parametros.put("P_PRINCIPIO", principioAtivo);
+        parametros.put("P_CONCENTRACAO", concentracao);
+        parametros.put("P_CORRIGIDO", corrigido ? "S" : "N");
+        adicionarItemReceita.execute(parametros);
+    }
+
+    /** Consulta um remédio no elenco sem gravar nada (mesma regra do PRC_ADICIONAR_ITEM). */
+    public String consultarFarmaciaPopular(String principioAtivo, String concentracao) {
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("P_PRINCIPIO", principioAtivo);
+        parametros.put("P_CONCENTRACAO", concentracao);
+        return consultarFarmaciaPopular.executeFunction(String.class, parametros);
     }
 }

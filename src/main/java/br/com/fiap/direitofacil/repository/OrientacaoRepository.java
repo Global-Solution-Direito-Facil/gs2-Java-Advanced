@@ -10,4 +10,7 @@ public interface OrientacaoRepository extends JpaRepository<Orientacao, Long> {
 
     /** Orientação de um caso, para a tela de detalhe. */
     Optional<Orientacao> findByCasoId(Long casoId);
+
+    /** Remove as orientações dos casos de uma pessoa, antes de remover os casos. */
+    void deleteByCasoPessoaId(Long pessoaId);
 }

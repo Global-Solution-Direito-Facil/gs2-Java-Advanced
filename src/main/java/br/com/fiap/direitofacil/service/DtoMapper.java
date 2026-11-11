@@ -2,6 +2,9 @@ package br.com.fiap.direitofacil.service;
 
 import br.com.fiap.direitofacil.dto.response.*;
 import br.com.fiap.direitofacil.entity.*;
+import br.com.fiap.direitofacil.enums.ResultadoFarmaciaPopular;
+
+import java.util.List;
 
 /** Converte entidades nos records de resposta da API. */
 public final class DtoMapper {
@@ -143,6 +146,61 @@ public final class DtoMapper {
                 caso.getDataPrazo(),
                 caso.getDataAtualizacao(),
                 toResponse(caso.getOrientacao())
+        );
+    }
+
+    public static MedicamentoFarmaciaPopularResponse toResponse(MedicamentoFarmaciaPopular medicamento) {
+        if (medicamento == null) {
+            return null;
+        }
+        return new MedicamentoFarmaciaPopularResponse(
+                medicamento.getId(),
+                medicamento.getIndicacao(),
+                medicamento.getTipoItem(),
+                medicamento.getPrincipioAtivo(),
+                medicamento.getConcentracao(),
+                medicamento.getObservacao(),
+                medicamento.getGratuito(),
+                medicamento.getFonte(),
+                medicamento.getDataElenco()
+        );
+    }
+
+    public static ReceitaItemResponse toResponse(ReceitaItem item) {
+        return new ReceitaItemResponse(
+                item.getId(),
+                item.getNomeLido(),
+                item.getPrincipioAtivo(),
+                item.getConcentracao(),
+                item.getCorrigido(),
+                item.getResultado(),
+                toResponse(item.getMedicamento()),
+                item.getOrientacao()
+        );
+    }
+
+    public static ReceitaResponse toResponse(Receita receita, List<ReceitaItem> itens) {
+        int gratuitos = (int) itens.stream()
+                .filter(item -> item.getResultado() == ResultadoFarmaciaPopular.GRATUITO)
+                .count();
+        return new ReceitaResponse(
+                receita.getId(),
+                toResumo(receita.getPessoa()),
+                receita.getDocumento() != null ? receita.getDocumento().getId() : null,
+                receita.getDataRegistro(),
+                itens.size(),
+                gratuitos,
+                itens.stream().map(DtoMapper::toResponse).toList()
+        );
+    }
+
+    public static HistoricoCasoResponse toResponse(AuditoriaCaso auditoria) {
+        return new HistoricoCasoResponse(
+                auditoria.getId(),
+                auditoria.getTipoOperacao(),
+                auditoria.getDataOperacao(),
+                auditoria.getStatusAnterior(),
+                auditoria.getStatusNovo()
         );
     }
 

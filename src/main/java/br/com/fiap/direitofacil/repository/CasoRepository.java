@@ -28,6 +28,12 @@ public interface CasoRepository extends JpaRepository<Caso, Long>, JpaSpecificat
     /** Casos em andamento sem atualização desde a data limite; alimenta o evento CasoParado. */
     List<Caso> findByStatusInAndDataAtualizacaoBefore(List<StatusCaso> status, LocalDateTime limite);
 
+    /** Verdadeiro se a pessoa tem algum caso que já saiu de ABERTO (em análise, protocolado, concedido...). */
+    boolean existsByPessoaIdAndStatusNot(Long pessoaId, StatusCaso status);
+
+    /** Remove os casos da pessoa (o gatilho do banco registra o DELETE na auditoria). */
+    void deleteByPessoaId(Long pessoaId);
+
     /** Impede apagar um direito que já tem casos abertos. */
     boolean existsByDireitoId(Long direitoId);
 }

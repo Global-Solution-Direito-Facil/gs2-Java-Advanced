@@ -6,8 +6,15 @@ import br.com.fiap.direitofacil.dto.response.PessoaResponse;
 import br.com.fiap.direitofacil.entity.Pessoa;
 import br.com.fiap.direitofacil.entity.Usuario;
 import br.com.fiap.direitofacil.enums.Role;
+import br.com.fiap.direitofacil.enums.StatusCaso;
+import br.com.fiap.direitofacil.repository.CasoRepository;
+import br.com.fiap.direitofacil.repository.DocumentoRepository;
+import br.com.fiap.direitofacil.repository.LaudoRepository;
+import br.com.fiap.direitofacil.repository.OrientacaoRepository;
 import br.com.fiap.direitofacil.repository.PessoaRepository;
 import br.com.fiap.direitofacil.repository.PlSqlRepository;
+import br.com.fiap.direitofacil.repository.ReceitaItemRepository;
+import br.com.fiap.direitofacil.repository.ReceitaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +34,12 @@ public class PessoaService {
     private final UsuarioService usuarioService;
     private final PlSqlRepository plSqlRepository;
     private final CasoEventoService casoEventoService;
+    private final CasoRepository casoRepository;
+    private final OrientacaoRepository orientacaoRepository;
+    private final LaudoRepository laudoRepository;
+    private final DocumentoRepository documentoRepository;
+    private final ReceitaRepository receitaRepository;
+    private final ReceitaItemRepository receitaItemRepository;
 
     @Transactional(readOnly = true)
     public Page<PessoaResponse> listar(String nome, Pageable pageable) {
@@ -85,6 +98,33 @@ public class PessoaService {
         plSqlRepository.reavaliarCasos(salva.getId(), LocalDateTime.now());
         casoEventoService.publicarNovos(salva.getId(), casosAntes);
         return DtoMapper.toResponse(salva);
+    }
+
+    /**
+     * Remove o beneficiário e tudo que é dele (receitas, orientações, casos, laudos e documentos).
+     * Só é permitido enquanto todos os casos estão ABERTO: caso já em análise, protocolado ou
+     * concluído tem histórico com o órgão e devolve 409. A remoção dos casos fica na auditoria do banco.
+     */
+    @Transactional
+    public void deletar(Long id) {
+        Pessoa pessoa = findEntityByIdAutorizado(id);
+        if (casoRepository.existsByPessoaIdAndStatusNot(id, StatusCaso.ABERTO)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "A pessoa tem casos em andamento ou concluídos e não pode ser removida.");
+        }
+        receitaItemRepository.deleteByReceitaPessoaId(id);
+        receitaItemRepository.flush();
+        receitaRepository.deleteByPessoaId(id);
+        receitaRepository.flush();
+        orientacaoRepository.deleteByCasoPessoaId(id);
+        orientacaoRepository.flush();
+        casoRepository.deleteByPessoaId(id);
+        casoRepository.flush();
+        laudoRepository.deleteByPessoaId(id);
+        laudoRepository.flush();
+        documentoRepository.deleteByPessoaId(id);
+        documentoRepository.flush();
+        repository.delete(pessoa);
     }
 
     /** Carrega a entidade ou lança 404; usado por documento, laudo e elegibilidade. */

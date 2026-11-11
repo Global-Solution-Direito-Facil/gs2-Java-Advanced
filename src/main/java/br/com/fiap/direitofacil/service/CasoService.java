@@ -3,9 +3,11 @@ package br.com.fiap.direitofacil.service;
 import br.com.fiap.direitofacil.auth.CurrentUser;
 import br.com.fiap.direitofacil.dto.request.AtualizarStatusCasoRequest;
 import br.com.fiap.direitofacil.dto.response.CasoResponse;
+import br.com.fiap.direitofacil.dto.response.HistoricoCasoResponse;
 import br.com.fiap.direitofacil.entity.Caso;
 import br.com.fiap.direitofacil.enums.ResultadoElegibilidade;
 import br.com.fiap.direitofacil.enums.StatusCaso;
+import br.com.fiap.direitofacil.repository.AuditoriaCasoRepository;
 import br.com.fiap.direitofacil.repository.CasoRepository;
 import br.com.fiap.direitofacil.repository.PlSqlRepository;
 import br.com.fiap.direitofacil.specification.CasoSpecification;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class CasoService {
     private final CasoRepository repository;
     private final PlSqlRepository plSqlRepository;
     private final EntityManager entityManager;
+    private final AuditoriaCasoRepository auditoriaRepository;
 
     @Transactional(readOnly = true)
     public Page<CasoResponse> listar(Long pessoaId, StatusCaso status, ResultadoElegibilidade resultado, Pageable pageable) {
@@ -58,6 +62,15 @@ public class CasoService {
         plSqlRepository.atualizarStatusCaso(id, request.status().name(), LocalDateTime.now());
         entityManager.refresh(caso);
         return DtoMapper.toResponse(caso);
+    }
+
+    /** Histórico do caso lido da trilha de auditoria que o gatilho do banco grava a cada mudança. */
+    @Transactional(readOnly = true)
+    public List<HistoricoCasoResponse> historico(Long id) {
+        findEntityByIdAutorizado(id);
+        return auditoriaRepository.findByCasoIdOrderByIdAsc(id).stream()
+                .map(DtoMapper::toResponse)
+                .toList();
     }
 
     /** Carrega a entidade ou lança 404. */

@@ -21,4 +21,7 @@ public interface DocumentoRepository extends JpaRepository<Documento, Long> {
 
     /** Documentos de todos os beneficiários de um responsável, para o cidadão ver os seus. */
     Page<Documento> findByPessoaUsuarioId(Long usuarioId, Pageable pageable);
+
+    /** Remove os documentos da pessoa. */
+    void deleteByPessoaId(Long pessoaId);
 }

@@ -60,6 +60,14 @@ public class PessoaController {
         return service.atualizar(id, request);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Excluir pessoa",
+            description = "Remove o beneficiário com laudos, documentos, receitas e casos. Devolve 409 se algum caso já saiu de ABERTO (em análise, protocolado ou concluído).")
+    public void deletar(@PathVariable Long id) {
+        service.deletar(id);
+    }
+
     @GetMapping("/{id}/laudos")
     @Operation(summary = "Laudos da pessoa", description = "Do mais recente para o mais antigo.")
     public List<LaudoResponse> laudos(@PathVariable Long id) {
