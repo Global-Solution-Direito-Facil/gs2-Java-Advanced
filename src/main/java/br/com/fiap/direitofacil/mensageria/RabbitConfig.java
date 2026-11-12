@@ -21,6 +21,9 @@ public class RabbitConfig {
     public static final String CASOS_EXCHANGE = "direitofacil.casos.exchange";
     public static final String PAINEL_GESTOR_QUEUE = "direitofacil.painel-gestor";
 
+    /** Fila da geração do passo a passo com IA: recebe só o DireitoIdentificado. */
+    public static final String ORIENTACAO_IA_QUEUE = "direitofacil.orientacao-ia";
+
     /** Fila da API .NET (exchange padrão): um evento DocumentoRecebido a cada upload. */
     public static final String DOCUMENTOS_RECEBIDOS_QUEUE = "documentos.recebidos";
 
@@ -50,6 +53,19 @@ public class RabbitConfig {
                 .bind(painelGestorQueue())
                 .to(casosExchange())
                 .with("caso.#");
+    }
+
+    @Bean
+    Queue orientacaoIaQueue() {
+        return QueueBuilder.durable(ORIENTACAO_IA_QUEUE).build();
+    }
+
+    @Bean
+    Binding orientacaoIaBinding() {
+        return BindingBuilder
+                .bind(orientacaoIaQueue())
+                .to(casosExchange())
+                .with(DIREITO_IDENTIFICADO_ROUTING_KEY);
     }
 
     /** O evento vai como JSON (a aula envia só uma String; aqui o painel precisa do caso inteiro). */
