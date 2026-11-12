@@ -2,7 +2,7 @@
 
 API REST do **Direito Fácil**, a solução CitizenTech do grupo para a Global Solution 2026/2: o cidadão envia o laudo médico, a **regra decide** a quais direitos federais ele tem acesso e a **IA explica** o passo a passo, e cada pedido (caso) é acompanhado até a concessão.
 
-O backend foi desenvolvido com **Java, Spring Boot, Oracle Database, Flyway, Spring Security com JWT e RabbitMQ**. É a mesma API consumida pelo app Mobile.
+O backend foi desenvolvido com **Java, Spring Boot, Oracle Database, Flyway, Spring Security com JWT, RabbitMQ e Spring AI (Google Gemini)**. É a mesma API consumida pelo app Mobile.
 
 ---
 
@@ -16,17 +16,15 @@ O backend foi desenvolvido com **Java, Spring Boot, Oracle Database, Flyway, Spr
 
 ---
 
-# 👥 Integrantes
+# 👥 Integrantes da Equipe
 
-| RM | Nome | Parte |
-|---|---|---|
-| RM565594 | João Vitor Biribilli Ravelli | Java · Database (entidades, JPA, JWT, RabbitMQ, PL/SQL, MongoDB) |
-| RM565554 | Alexander Dennis Isidro Mamani | Java · IoT & IA (Spring AI) |
-| RM561378 | Pietro Paranhos Wilhelm | .NET · DevOps |
-| RM563748 | Kelson Zhang | Mobile |
-| RM564093 | Gabriel Neris Losano | Compliance · produto |
-
-Turma: **2TDSPG**
+| Nome                               | RM     | Turma  | GitHub                                          | LinkedIn                                                            |
+| ---------------------------------- | ------ | ------ | ----------------------------------------------- | ------------------------------------------------------------------- |
+| **Alexander Dennis Isidro Mamani** | 565554 | 2TDSPG | [alex-isidro](https://github.com/alex-isidro)   | [LinkedIn](https://www.linkedin.com/in/alexander-dennis-a3b48824b/) |
+| **Gabriel Neris Losano**           | 564093 | 2TDSPG | [GNLosano](https://github.com/GNLosano)         | [LinkedIn](https://www.linkedin.com/in/gabriellosano/)              |
+| **João Vítor Biribilli Ravelli**   | 565594 | 2TDSPG | [biribillidev](https://github.com/biribillidev) | —                                                                   |
+| **Kelson Zhang**                   | 563748 | 2TDSPG | [KelsonZh0](https://github.com/KelsonZh0)       | [LinkedIn](https://www.linkedin.com/in/kelson-zhang-211456323/)     |
+| **Pietro Paranhos Wilhelm**        | 561378 | 2TDSPG | —                                               | —                                                                   |
 
 ---
 
@@ -53,8 +51,8 @@ O banco de dados (scripts Oracle, PL/SQL e MongoDB) está no repositório [Direi
 | 01 | API REST: 3+ entidades relacionadas, CRUD com Spring Data JPA e paginação | Pessoa, Direito, Caso, Documento, Laudo, Receita... CRUD completo de Pessoa e Direito; listagens com `Pageable` e `PageResponse` |
 | 02 | Bean Validation nos DTOs e `@RestControllerAdvice` | `dto/request` (`@NotBlank`, `@Size`, `@Cpf`, `@AssertTrue`...) e `exception/GlobalExceptionHandler` com `ErroResponse` padronizado |
 | 03 | Spring Security + JWT, 2 papéis, endpoints protegidos por papel | `CIDADAO` e `GESTOR`; `SecurityConfig` e `@PreAuthorize` nos controllers |
-| 04 | Spring AI integrado ao fluxo | Parte do Alex: seção [Spring AI](#-spring-ai) |
-| 05 | Arquitetura distribuída: **opção A (RabbitMQ)** | Eventos de caso publicados e consumidos de forma assíncrona: seção [RabbitMQ](#-requisito-5--opção-a-rabbitmq) |
+| 04 | Spring AI integrado ao fluxo | Leitura do laudo e da receita (multimodal, saída estruturada) e passo a passo do caso com RAG: pacote `ia` e seção [Spring AI](#-spring-ai) |
+| 05 | Arquitetura distribuída: **opção A (RabbitMQ)** | Eventos de caso publicados e consumidos de forma assíncrona, e consumo do evento `DocumentoRecebido` da API .NET: seção [RabbitMQ](#-requisito-5--opção-a-rabbitmq) |
 | 06 | Swagger/OpenAPI, README, API consumida pelo Mobile | `/swagger-ui.html`, este README e a seção [Integração](#-integração-com-o-mobile-e-a-net) |
 
 ---
@@ -71,6 +69,7 @@ O banco de dados (scripts Oracle, PL/SQL e MongoDB) está no repositório [Direi
 - Flyway
 - Spring AMQP (RabbitMQ) e `@Retryable` do Spring (resiliência)
 - `@Scheduled` (monitor de prazos)
+- Spring AI 2.0.1 com Google Gemini: chat multimodal, saída estruturada, embeddings e vector store (RAG)
 - Springdoc OpenAPI / Swagger
 - Lombok
 - Maven Wrapper
@@ -96,15 +95,17 @@ Oracle Database (tabelas T_DF_* e pacotes PL/SQL)
 src/main/java/br/com/fiap/direitofacil/
 
 ├── auth/            Segurança: SecurityConfig, usuário autenticado, respostas 401/403
-├── config/          JWT, Swagger e conversor S/N
-├── controller/      Endpoints REST (/api/v1/...)
+├── config/          JWT, Swagger, Spring AI (IaConfig), endereço da .NET e conversor S/N
+├── controller/      Endpoints REST (/api/v1/...); os de IA começam com "Ia"
+├── ia/              Spring AI: leitura do laudo e da receita e passo a passo com RAG
+├── integracao/      Cliente HTTP da API .NET (download do arquivo e status do documento)
 ├── dto/
 │   ├── request/     Dados recebidos, com Bean Validation
 │   └── response/    Dados devolvidos
 ├── entity/          Entidades JPA (tabelas T_DF_*)
 ├── enums/           Enumerações do domínio (mesmos valores dos CHECK do banco)
 ├── exception/       GlobalExceptionHandler e ErroResponse
-├── mensageria/      RabbitConfig, publicador e consumidor dos eventos
+├── mensageria/      RabbitConfig, publicador e consumidores dos eventos
 ├── repository/      Spring Data JPA e chamadas aos pacotes PL/SQL
 ├── service/         Regras da aplicação
 ├── specification/   Filtros dinâmicos de casos
@@ -115,6 +116,7 @@ src/main/java/br/com/fiap/direitofacil/
 src/main/resources/
 
 ├── application.properties
+├── conhecimento/    Base de conhecimento do RAG: como pedir cada direito, com a fonte
 └── db/migration/    V1 a V5 (schema, procedures de carga, carga, pacotes/gatilhos, casos da demo)
 ```
 
@@ -260,10 +262,12 @@ O Flyway cria as tabelas, os pacotes PL/SQL e os dados de demonstração na prim
 | `RABBITMQ_VHOST` / `RABBITMQ_SSL` | não | `/` / `false` |
 | `DOTNET_API_URL` | não | URL da API .NET, sem o prefixo (ex.: `https://host`); sem ela as chamadas para a .NET ficam indisponíveis |
 | `DOTNET_API_PREFIX` | não | `/api/v1` |
+| `GEMINI_API_KEY` | não | chave do Google Gemini (Google AI Studio); sem ela a API sobe e só as funções de IA respondem 503 |
+| `GEMINI_CHAT_MODEL` / `GEMINI_EMBEDDING_MODEL` | não | `gemini-2.5-flash` / `gemini-embedding-001` |
 | `MONITOR_CRON` | não | `0 0 8 * * *` (todo dia às 8h) |
 | `PORT` | não | `8080` |
 
-Sem `JWT_SECRET` (ou com menos de 32 caracteres) a aplicação não sobe e avisa o motivo.
+Sem `JWT_SECRET` (ou com menos de 32 caracteres) a aplicação não sobe e avisa o motivo. `GEMINI_API_KEY` e `DOTNET_API_URL` são opcionais: sem elas todo o restante da API funciona, e o laudo pode ser registrado pelo gestor em `POST /api/v1/laudos`.
 
 ### Windows (PowerShell)
 
@@ -376,6 +380,15 @@ Ao cadastrar uma pessoa, a regra PL/SQL já abre os casos. Ao atualizar (por exe
 | GET / DELETE | `/receitas/{id}` | dono ou gestor |
 | POST | `/receitas/{id}/itens` | dono ou gestor |
 
+## Inteligência artificial (Spring AI)
+
+| Método | Rota | Quem |
+|---|---|---|
+| POST | `/receitas/extracao` (lê a foto da receita e devolve os remédios para conferência) | dono do documento |
+| POST | `/casos/{id}/orientacao/gerar` (gera o passo a passo com RAG e grava no caso) | dono ou gestor |
+
+A leitura do laudo não tem rota: ela acontece sozinha quando a API .NET publica o evento `DocumentoRecebido`.
+
 ## Painel do gestor e usuários
 
 | Método | Rota | Quem |
@@ -413,6 +426,15 @@ API (service)  --convertAndSend-->  exchange direitofacil.casos.exchange (topic)
 - **Publicação:** `EventoCasoPublisher` usa `rabbitTemplate.convertAndSend`. Se o RabbitMQ falhar, `@Retryable` tenta de novo com backoff exponencial (3 tentativas, 500 ms, multiplicador 2). Se ainda assim falhar, a requisição do cidadão não quebra: o aviso só vai para o log.
 - **Agendamento:** `MonitorCasosService` roda com `@Scheduled` todo dia às 8h. Para a demonstração, o gestor pode rodar na hora com `POST /api/v1/painel/verificar-prazos`, que responde **202 Accepted**: os eventos vão para a fila e o consumidor processa depois.
 - **Consumo:** `PainelGestorListener` recebe cada evento e o guarda em memória (até 200, os mais recentes primeiro). O histórico oficial do caso é a auditoria do banco.
+
+Além do painel, a API tem mais dois consumidores:
+
+| Fila | Consumidor | O que faz |
+|---|---|---|
+| `direitofacil.orientacao-ia` (binding `caso.direito-identificado`) | `OrientacaoIaListener` | a cada caso aberto, gera o passo a passo com RAG e grava no caso |
+| `documentos.recebidos` (exchange padrão, publicada pela API .NET) | `DocumentoRecebidoListener` | a cada laudo enviado pelo app, baixa o arquivo, lê com a IA e grava o laudo |
+
+Nenhum dos dois devolve a mensagem para a fila em caso de falha: o erro fica no log e no status do documento, e a operação pode ser refeita depois.
 
 Exemplo de mensagem (JSON):
 
@@ -454,7 +476,69 @@ Quem decide é a tabela `T_DF_MEDICAMENTO_FP`, com o elenco oficial de 41 itens 
 
 # 🤖 Spring AI
 
-> **Parte do Alex (Java · IoT & IA), a completar por ele:** extração do laudo e da receita com Spring AI e RAG com as fontes (leis e cartilhas). Neste repositório, a API já recebe o resultado dessa parte em `POST /api/v1/laudos` (laudo estruturado), `PUT /api/v1/casos/{id}/orientacao` (passo a passo com a fonte) e `POST /api/v1/receitas/{id}/itens` (remédio conferido).
+A IA usa **Spring AI 2.0.1 com o Google Gemini** e está toda no pacote `ia`. Ela tem três funções, e em nenhuma decide se a pessoa tem direito: ela lê documentos e explica como pedir.
+
+| Função | Classe | Recurso do Spring AI | Quando roda |
+|---|---|---|---|
+| Ler o laudo | `IaLaudoService` | multimodal (foto ou PDF) + saída estruturada (`.entity`) | evento `DocumentoRecebido` da API .NET |
+| Ler a receita | `IaReceitaService` | multimodal + saída estruturada | `POST /api/v1/receitas/extracao` |
+| Escrever o passo a passo | `IaOrientacaoService` | RAG: embeddings + vector store + saída estruturada | evento `DIREITO_IDENTIFICADO` ou `POST /api/v1/casos/{id}/orientacao/gerar` |
+
+## Leitura do laudo
+
+```text
+App → API .NET (upload) → RabbitMQ documentos.recebidos → DocumentoRecebidoListener
+        │
+        ├─ identifica o beneficiário (pessoaId do evento, conferido com a conta que enviou)
+        ├─ baixa o arquivo na .NET com o token SERVICO
+        ├─ Gemini lê e devolve CID, condição, tipo da condição e data
+        ├─ LaudoService grava o laudo → PRC_REAVALIAR_CASOS abre os casos
+        └─ PATCH na .NET: EXTRAIDO ou FALHA
+```
+
+- A IA só transcreve: temperatura 0, e o prompt proíbe deduzir ou opinar sobre direitos. Se faltar CID, condição ou data, o laudo **não é gravado**.
+- O mesmo evento entregue duas vezes não gera um segundo laudo (a chave de idempotência é o `eventId`).
+- Se o evento não trouxer `pessoaId`, vale o único beneficiário da conta. Com mais de um, a leitura é marcada como `FALHA` em vez de adivinhar.
+
+## Leitura da receita
+
+`POST /api/v1/receitas/extracao` recebe o id do documento na .NET e devolve os remédios lidos:
+
+```json
+[
+  { "nome": "Losartana Potássica", "principioAtivo": "losartana potássica", "dosagem": "50 mg" }
+]
+```
+
+- Nada é gravado: a pessoa confere na tela e só depois a tabela do Farmácia Popular decide o que é gratuito.
+- O arquivo é baixado com o token de quem fez o pedido, e não com o de serviço. Assim a própria .NET recusa o documento de outra pessoa.
+- O princípio ativo só é preenchido se estiver escrito na receita. A IA nunca sugere trocar remédio ou dosagem.
+
+## Passo a passo com RAG
+
+```text
+caso aberto → evento DIREITO_IDENTIFICADO → OrientacaoIaListener
+        │
+        ├─ busca por semelhança na base de conhecimento (embeddings do Gemini)
+        ├─ Gemini escreve de 3 a 7 passos usando só os trechos encontrados
+        └─ grava a orientação no caso, com a fonte do trecho usado
+```
+
+- **Base de conhecimento:** `src/main/resources/conhecimento/direitos.md`, com um texto para cada um dos 20 direitos do catálogo ("como pedir" e a fonte). Um teste garante que todo direito do banco tem texto na base.
+- **A fonte não é escrita pela IA:** ela vem do trecho que foi realmente usado, então a IA não tem como citar uma lei que não existe.
+- **Nenhum dado da pessoa vai para o modelo:** só o nome do direito, o órgão e a base legal.
+- **Sem trecho, sem orientação:** se a base não tiver o direito, nada é gravado e o app mostra a base legal.
+- **Vector store em memória** (`SimpleVectorStore`): o Oracle 19c da FIAP não tem tipo vetorial e a base é pequena. A indexação acontece na primeira consulta, não na subida.
+- Os casos da carga de demonstração não passam pelo evento. Para eles, use `POST /api/v1/casos/{id}/orientacao/gerar`.
+
+## Erros da IA
+
+| Código | Quando |
+|---|---|
+| 422 | o arquivo não é um laudo ou uma receita legível, ou a base não tem orientação para o direito |
+| 503 | `GEMINI_API_KEY` ausente ou Gemini indisponível |
+| 404 | documento inexistente na .NET ou de outra pessoa |
+| 502 | API .NET fora do ar |
 
 ---
 
@@ -463,7 +547,21 @@ Quem decide é a tabela `T_DF_MEDICAMENTO_FP`, com o elenco oficial de 41 itens 
 - **App Mobile:** faz login só nesta API (`POST /api/v1/auth/login`) e consome as rotas `/api/v1/...`. As listagens são paginadas (`content`, `page`, `size`, `totalElements`, `totalPages`).
 - **API .NET (documentos e envios):** tem banco próprio. Aceita o token emitido por esta API: HS256, mesma `JWT_SECRET`, mesmos `iss` e `aud`, `sub` = e-mail, `role` sem prefixo. O e-mail liga os documentos à pessoa.
 - **Chamadas do Java para a .NET (`integracao/DocumentosDotnetClient`):** `GET /api/v1/documentos/{id}/arquivo` para baixar o arquivo e `PATCH /api/v1/documentos/{id}/status` com `EXTRAIDO` ou `FALHA`. As duas usam um token de papel `SERVICO`, gerado pelo próprio Java, que vale 5 minutos e nunca passa pelo app.
-- **Evento `DocumentoRecebido`:** publicado pela .NET quando o arquivo chega. O consumidor no Java será ligado quando o formato da mensagem for fechado com a .NET. Até lá, o registro do documento é feito por `POST /api/v1/documentos`.
+- **Evento `DocumentoRecebido`:** publicado pela .NET na fila `documentos.recebidos` quando o arquivo chega, e consumido aqui pelo `DocumentoRecebidoListener` (seção [Spring AI](#-spring-ai)). O `pessoaId` é opcional:
+
+```json
+{
+  "eventId": "8c1f0c5e-1f0a-4a55-9d7b-2f6f0d1b7a11",
+  "documentoId": "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
+  "cidadaoId": "ana.almeida@email.com",
+  "pessoaId": 1,
+  "tipoDocumento": "LAUDO",
+  "contentType": "application/pdf",
+  "criadoEm": "2026-11-11T14:30:00Z"
+}
+```
+
+- **Sem a .NET no ar**, a API continua funcionando: o gestor registra o laudo por `POST /api/v1/laudos` e o documento por `POST /api/v1/documentos`.
 
 ---
 
@@ -491,7 +589,9 @@ Toda falha devolve o mesmo corpo (`ErroResponse`):
 | 403 | papel errado ou dado de outra pessoa |
 | 404 | registro não encontrado (inclui `ORA-20022`, `-20023`, `-20040`, `-20041`, `-20051`, `-20060`, `-20061`) |
 | 409 | duplicado ou fluxo de status inválido (`ORA-20032`, `-20033`) |
-| 422 | regra violada (`ORA-20031`, `-20034`, senha atual errada, documento de outra pessoa) |
+| 422 | regra violada (`ORA-20031`, `-20034`, senha atual errada, documento de outra pessoa) ou arquivo que a IA não conseguiu ler |
+| 502 | a API .NET não respondeu ao download do arquivo |
+| 503 | IA indisponível (sem `GEMINI_API_KEY` ou Gemini fora do ar) ou API .NET não configurada |
 
 Os erros `ORA-200xx` vêm dos pacotes e gatilhos PL/SQL. A mensagem do banco vai em `mensagem`, e o código em `detalhes`.
 
@@ -518,6 +618,10 @@ mvnw.cmd clean test      # Windows
 - `SegurancaEndpointsTest` (MockMvc, sem banco): 401 sem token com o corpo padrão, 403 para papel errado (antes da validação do corpo), 400 de validação para o gestor, painel restrito ao GESTOR e login público.
 - `TokenServiceTest` (sem banco): contrato do token com a .NET (HS256, `sub` = e-mail, `role` sem `ROLE_`), token recusado com outra chave e chave curta impedindo a subida.
 - `DocumentosDotnetClientTest` (sem banco, servidor HTTP local): rotas, token `SERVICO` e corpo do `PATCH` nas chamadas para a .NET, e o comportamento quando ela falha.
+- `ProcessamentoDocumentoServiceTest` (sem banco): o caminho do laudo que chega pela fila, incluindo evento repetido, beneficiário de outra conta e falha da leitura.
+- `LaudoLidoTest`, `ReceitaLidaTest` e `OrientacaoGeradaTest` (sem IA): a conferência do que a IA devolve antes de gravar (dados obrigatórios, datas, limites das colunas).
+- `IaReceitaServiceTest` e `IaOrientacaoServiceTest` (sem IA): download em nome de quem pediu, escolha dos trechos do RAG e origem da fonte.
+- `IaBaseConhecimentoTest`: todo direito do catálogo do banco tem texto na base de conhecimento.
 - `DireitoFacilApplicationTests`: sobe o contexto completo. Só roda com `DB_URL` e `JWT_SECRET` definidas.
 
 ---
@@ -531,6 +635,10 @@ mvnw.cmd clean test      # Windows
 | `401` em endpoint protegido | token ausente ou expirado: faça login de novo |
 | `403` | papel errado (ex.: cidadão em rota de gestor) ou dado de outra pessoa |
 | Avisos não aparecem no painel | RabbitMQ fora: rode `docker compose up -d` (a API continua funcionando sem ele) |
+| `503` nas rotas de IA | `GEMINI_API_KEY` ausente ou inválida, ou limite de requisições do Gemini atingido |
+| Caso sem orientação | caso da carga de demonstração ou IA indisponível na hora: use `POST /api/v1/casos/{id}/orientacao/gerar` |
+| `401` da .NET ao baixar o arquivo | `JWT_SECRET`, issuer ou audience diferentes entre as duas APIs |
+| `404` da .NET em todas as chamadas | prefixo das rotas diferente: ajuste `DOTNET_API_PREFIX` |
 
 ---
 
