@@ -20,7 +20,7 @@ O backend foi desenvolvido com **Java, Spring Boot, Oracle Database, Flyway, Spr
 
 | Nome                               | RM     | Turma  | GitHub                                          | LinkedIn                                                            |
 | ---------------------------------- | ------ | ------ | ----------------------------------------------- | ------------------------------------------------------------------- |
-| **Alexander Dennis Isidro Mamani** | 565554 | 2TDSPG | [alex-isidro](https://github.com/alex-isidro)   | [LinkedIn](https://www.linkedin.com/in/alexander-dennis-a3b48824b/) |
+| **Alexander Dennis Isidro Mamani** | 565554 | 2TDSPG | [alex-isidro](https://github.com/alex-isidro)   | [LinkedIn](https://www.linkedin.com/in/alexander-isidro/) |
 | **Gabriel Neris Losano**           | 564093 | 2TDSPG | [GNLosano](https://github.com/GNLosano)         | [LinkedIn](https://www.linkedin.com/in/gabriellosano/)              |
 | **João Vítor Biribilli Ravelli**   | 565594 | 2TDSPG | [biribillidev](https://github.com/biribillidev) | —                                                                   |
 | **Kelson Zhang**                   | 563748 | 2TDSPG | [KelsonZh0](https://github.com/KelsonZh0)       | [LinkedIn](https://www.linkedin.com/in/kelson-zhang-211456323/)     |
