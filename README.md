@@ -476,13 +476,41 @@ Quem decide é a tabela `T_DF_MEDICAMENTO_FP`, com o elenco oficial de 41 itens 
 
 # 🤖 Spring AI
 
-A IA usa **Spring AI 2.0.1 com o Google Gemini** e está toda no pacote `ia`. Ela tem três funções, e em nenhuma decide se a pessoa tem direito: ela lê documentos e explica como pedir.
+A IA usa **Spring AI 2.0.1 com o Google Gemini** e está toda no pacote `ia`. Ela não é um chat solto: entra em três pontos do caminho do cidadão, sempre para **ler um documento** ou **explicar como pedir um direito**. Em nenhum deles decide se a pessoa tem direito.
 
 | Função | Classe | Recurso do Spring AI | Quando roda |
 |---|---|---|---|
 | Ler o laudo | `IaLaudoService` | multimodal (foto ou PDF) + saída estruturada (`.entity`) | evento `DocumentoRecebido` da API .NET |
 | Ler a receita | `IaReceitaService` | multimodal + saída estruturada | `POST /api/v1/receitas/extracao` |
 | Escrever o passo a passo | `IaOrientacaoService` | RAG: embeddings + vector store + saída estruturada | evento `DIREITO_IDENTIFICADO` ou `POST /api/v1/casos/{id}/orientacao/gerar` |
+
+## Como a IA foi configurada
+
+- **Modelos:** `gemini-2.5-flash` lê os documentos e escreve o passo a passo; `gemini-embedding-001` gera os embeddings do RAG. Dá para trocar por `GEMINI_CHAT_MODEL` e `GEMINI_EMBEDDING_MODEL`.
+- **Temperatura 0:** a mesma entrada tende a dar a mesma resposta, o que importa em leitura de documento.
+- **Chave opcional:** o cliente do Gemini é montado em `config/IaConfig`. Sem `GEMINI_API_KEY` a aplicação sobe normalmente e só as funções de IA respondem `503`.
+- **Arquivos aceitos:** PDF, JPEG e PNG, com tempo máximo de 60 segundos por chamada (`GEMINI_TIMEOUT_MS`).
+
+As duas leituras usam a mesma chamada, em `ia/IaLeitorDocumento`:
+
+```java
+T lido = chatClient.prompt()
+        .system(promptSistema)   // as regras do que a IA pode e não pode fazer
+        .user(usuario -> usuario.text(pedido)
+                .media(MimeType.valueOf(arquivo.tipoMidia()), new ByteArrayResource(arquivo.conteudo())))
+        .call()
+        .entity(formato);        // LaudoLido.class ou ReceitaLida.class
+```
+
+O `.entity(...)` é a **saída estruturada**: o modelo devolve JSON no formato de um `record` Java, e não texto livre. Assim o Java confere campo a campo antes de gravar.
+
+## O que cada prompt manda e proíbe
+
+| Função | O que a IA deve fazer | O que é proibido |
+|---|---|---|
+| Laudo | transcrever CID, condição, tipo da condição e data como estão escritos | deduzir ou completar dado que não está no laudo; opinar sobre direitos, benefícios ou tratamento |
+| Receita | listar os remédios na ordem da receita, com nome e dosagem como estão escritos | inventar remédio ou dosagem; sugerir troca; opinar sobre o tratamento |
+| Passo a passo | escrever de 3 a 7 passos curtos, em linguagem simples, usando só os trechos da base | acrescentar regra, valor, prazo, endereço, telefone ou site que não esteja nos trechos; dizer se a pessoa tem direito |
 
 ## Leitura do laudo
 
@@ -496,9 +524,16 @@ App → API .NET (upload) → RabbitMQ documentos.recebidos → DocumentoRecebid
         └─ PATCH na .NET: EXTRAIDO ou FALHA
 ```
 
-- A IA só transcreve: temperatura 0, e o prompt proíbe deduzir ou opinar sobre direitos. Se faltar CID, condição ou data, o laudo **não é gravado**.
-- O mesmo evento entregue duas vezes não gera um segundo laudo (a chave de idempotência é o `eventId`).
-- Se o evento não trouxer `pessoaId`, vale o único beneficiário da conta. Com mais de um, a leitura é marcada como `FALHA` em vez de adivinhar.
+Formato do que o modelo devolve (`ia/LaudoLido`):
+
+```json
+{ "legivel": true, "codCid": "F84.0", "condicao": "Transtorno do espectro autista", "tipoCondicao": "TEA", "dataLaudo": "2026-03-10", "observacao": "" }
+```
+
+- **O Java confere antes de gravar:** se o arquivo não for um laudo legível, ou faltar CID, condição ou data (ou a data estiver no futuro), o laudo **não é gravado** e a .NET recebe `FALHA`.
+- **Na dúvida, nenhum direito é aberto por engano:** o tipo da condição é o único dado da IA que entra na regra, e um tipo não reconhecido vira `OUTRA`, que não conta como deficiência.
+- **Evento repetido não gera um segundo laudo:** a chave de idempotência é o `eventId`.
+- **Sem `pessoaId` no evento,** vale o único beneficiário da conta. Com mais de um, a leitura é marcada como `FALHA` em vez de adivinhar.
 
 ## Leitura da receita
 
@@ -510,26 +545,35 @@ App → API .NET (upload) → RabbitMQ documentos.recebidos → DocumentoRecebid
 ]
 ```
 
-- Nada é gravado: a pessoa confere na tela e só depois a tabela do Farmácia Popular decide o que é gratuito.
-- O arquivo é baixado com o token de quem fez o pedido, e não com o de serviço. Assim a própria .NET recusa o documento de outra pessoa.
-- O princípio ativo só é preenchido se estiver escrito na receita. A IA nunca sugere trocar remédio ou dosagem.
+- **Nada é gravado:** a pessoa confere na tela e só depois a tabela do Farmácia Popular decide o que é gratuito.
+- **O arquivo é baixado com o token de quem fez o pedido,** e não com o de serviço. Assim a própria .NET recusa o documento de outra pessoa.
+- **O princípio ativo só é preenchido se estiver escrito na receita.** Na dúvida o modelo deixa vazio e a pessoa completa.
 
 ## Passo a passo com RAG
+
+O RAG faz a IA escrever a partir de um texto conferido pelo grupo, em vez de responder de memória.
 
 ```text
 caso aberto → evento DIREITO_IDENTIFICADO → OrientacaoIaListener
         │
-        ├─ busca por semelhança na base de conhecimento (embeddings do Gemini)
-        ├─ Gemini escreve de 3 a 7 passos usando só os trechos encontrados
+        ├─ busca os 3 trechos mais parecidos na base de conhecimento (embeddings do Gemini)
+        ├─ se algum trecho tem o mesmo código do direito, ficam só eles
+        ├─ Gemini escreve de 3 a 7 passos usando só esses trechos
         └─ grava a orientação no caso, com a fonte do trecho usado
 ```
 
-- **Base de conhecimento:** `src/main/resources/conhecimento/direitos.md`, com um texto para cada um dos 20 direitos do catálogo ("como pedir" e a fonte). Um teste garante que todo direito do banco tem texto na base.
+- **Base de conhecimento:** `src/main/resources/conhecimento/direitos.md`, com um texto para cada um dos 20 direitos do catálogo. Cada texto tem título, `Código:`, `Fonte:` e a lista "Como pedir". Um teste garante que todo direito do banco tem texto na base.
+- **Um trecho por direito:** `IaBaseConhecimento` divide o arquivo nos títulos; o código e a fonte viram metadados do trecho.
+- **O filtro pelo código** evita misturar direitos parecidos, como o BPC do idoso e o da pessoa com deficiência.
 - **A fonte não é escrita pela IA:** ela vem do trecho que foi realmente usado, então a IA não tem como citar uma lei que não existe.
-- **Nenhum dado da pessoa vai para o modelo:** só o nome do direito, o órgão e a base legal.
-- **Sem trecho, sem orientação:** se a base não tiver o direito, nada é gravado e o app mostra a base legal.
+- **Trechos de outro direito, sem orientação:** o modelo sinaliza quando os trechos não tratam do direito pedido; nesse caso nada é gravado e o app mostra a base legal.
 - **Vector store em memória** (`SimpleVectorStore`): o Oracle 19c da FIAP não tem tipo vetorial e a base é pequena. A indexação acontece na primeira consulta, não na subida.
-- Os casos da carga de demonstração não passam pelo evento. Para eles, use `POST /api/v1/casos/{id}/orientacao/gerar`.
+- **Automático e sob demanda:** o caso novo recebe a orientação pelo evento. Para os casos da carga de demonstração, ou se a geração automática falhar, use `POST /api/v1/casos/{id}/orientacao/gerar`.
+
+## Privacidade
+
+- **Passo a passo:** só o nome do direito, o órgão, a base legal e os trechos da base vão para o modelo. Nenhum dado da pessoa.
+- **Leituras:** o arquivo do laudo ou da receita é enviado ao Gemini, porque a leitura depende disso.
 
 ## Erros da IA
 
@@ -539,6 +583,14 @@ caso aberto → evento DIREITO_IDENTIFICADO → OrientacaoIaListener
 | 503 | `GEMINI_API_KEY` ausente ou Gemini indisponível |
 | 404 | documento inexistente na .NET ou de outra pessoa |
 | 502 | API .NET fora do ar |
+
+## Como testar a IA
+
+1. Defina `GEMINI_API_KEY` e suba a aplicação.
+2. Faça login com um cidadão de demonstração e pegue um caso em `GET /api/v1/casos/me`.
+3. Chame `POST /api/v1/casos/{id}/orientacao/gerar` e confira o passo a passo e a fonte.
+
+A orientação só depende do Gemini. As leituras de receita e de laudo precisam também da API .NET no ar, e a do laudo, do RabbitMQ.
 
 ---
 
