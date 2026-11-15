@@ -14,7 +14,7 @@ public record DotnetApiProperties(
 ) {
     public DotnetApiProperties {
         url = url == null ? "" : url.strip().replaceAll("/+$", "");
-        prefixo = prefixo == null || prefixo.isBlank() ? "/api/v1" : "/" + prefixo.strip().replaceAll("^/+|/+$", "");
+        prefixo = prefixo == null || prefixo.isBlank() ? "/api" : "/" + prefixo.strip().replaceAll("^/+|/+$", "");
         if (timeoutSegundos == null || timeoutSegundos <= 0) {
             timeoutSegundos = 30;
         }
@@ -24,7 +24,7 @@ public record DotnetApiProperties(
         return !url.isBlank();
     }
 
-    /** URL base das rotas de documentos, por exemplo https://host/api/v1/documentos. */
+    /** URL base das rotas de documentos, por exemplo https://host/api/documentos. */
     public String urlDocumentos() {
         return url + prefixo + "/documentos";
     }

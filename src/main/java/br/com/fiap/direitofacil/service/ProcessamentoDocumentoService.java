@@ -72,6 +72,9 @@ public class ProcessamentoDocumentoService {
             arquivo = dotnetClient.baixarArquivo(evento.documentoId());
         } catch (ResponseStatusException e) {
             log.warn("Documento {}: arquivo indisponível ({})", evento.documentoId(), e.getReason());
+            // Sem este aviso o documento ficaria como Recebido para sempre na .NET.
+            existente.ifPresent(documento -> documentoService.marcarErro(documento.getId()));
+            dotnetClient.informarStatus(evento.documentoId(), StatusDocumentoDotnet.FALHA);
             return Resultado.ARQUIVO_INDISPONIVEL;
         }
 

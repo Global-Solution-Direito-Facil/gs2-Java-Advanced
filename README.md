@@ -261,7 +261,7 @@ O Flyway cria as tabelas, os pacotes PL/SQL e os dados de demonstração na prim
 | `RABBITMQ_USERNAME` / `RABBITMQ_PASSWORD` | não | `myuser` / `secret` (iguais ao `docker-compose.yml`) |
 | `RABBITMQ_VHOST` / `RABBITMQ_SSL` | não | `/` / `false` |
 | `DOTNET_API_URL` | não | URL da API .NET, sem o prefixo (ex.: `https://host`); sem ela as chamadas para a .NET ficam indisponíveis |
-| `DOTNET_API_PREFIX` | não | `/api/v1` |
+| `DOTNET_API_PREFIX` | não | `/api` (a .NET responde em `/api/documentos`, sem o `v1`) |
 | `GEMINI_API_KEY` | não | chave do Google Gemini (Google AI Studio); sem ela a API sobe e só as funções de IA respondem 503 |
 | `GEMINI_CHAT_MODEL` / `GEMINI_EMBEDDING_MODEL` | não | `gemini-2.5-flash` / `gemini-embedding-001` |
 | `MONITOR_CRON` | não | `0 0 8 * * *` (todo dia às 8h) |
@@ -490,7 +490,7 @@ A IA usa **Spring AI 2.0.1 com o Google Gemini** e está toda no pacote `ia`. El
 App → API .NET (upload) → RabbitMQ documentos.recebidos → DocumentoRecebidoListener
         │
         ├─ identifica o beneficiário (pessoaId do evento, conferido com a conta que enviou)
-        ├─ baixa o arquivo na .NET com o token SERVICO
+        ├─ baixa o arquivo na .NET com o token SERVICO (se o download falhar: PATCH FALHA)
         ├─ Gemini lê e devolve CID, condição, tipo da condição e data
         ├─ LaudoService grava o laudo → PRC_REAVALIAR_CASOS abre os casos
         └─ PATCH na .NET: EXTRAIDO ou FALHA
@@ -546,7 +546,7 @@ caso aberto → evento DIREITO_IDENTIFICADO → OrientacaoIaListener
 
 - **App Mobile:** faz login só nesta API (`POST /api/v1/auth/login`) e consome as rotas `/api/v1/...`. As listagens são paginadas (`content`, `page`, `size`, `totalElements`, `totalPages`).
 - **API .NET (documentos e envios):** tem banco próprio. Aceita o token emitido por esta API: HS256, mesma `JWT_SECRET`, mesmos `iss` e `aud`, `sub` = e-mail, `role` sem prefixo. O e-mail liga os documentos à pessoa.
-- **Chamadas do Java para a .NET (`integracao/DocumentosDotnetClient`):** `GET /api/v1/documentos/{id}/arquivo` para baixar o arquivo e `PATCH /api/v1/documentos/{id}/status` com `EXTRAIDO` ou `FALHA`. As duas usam um token de papel `SERVICO`, gerado pelo próprio Java, que vale 5 minutos e nunca passa pelo app.
+- **Chamadas do Java para a .NET (`integracao/DocumentosDotnetClient`):** `GET /api/documentos/{id}/arquivo` para baixar o arquivo e `PATCH /api/documentos/{id}/status` com `EXTRAIDO` ou `FALHA`. As duas usam um token de papel `SERVICO`, gerado pelo próprio Java, que vale 5 minutos e nunca passa pelo app.
 - **Evento `DocumentoRecebido`:** publicado pela .NET na fila `documentos.recebidos` quando o arquivo chega, e consumido aqui pelo `DocumentoRecebidoListener` (seção [Spring AI](#-spring-ai)). O `pessoaId` é opcional:
 
 ```json

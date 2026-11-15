@@ -78,7 +78,7 @@ class DocumentosDotnetClientTest {
 
     private DocumentosDotnetClient cliente() {
         String url = "http://127.0.0.1:" + servidor.getAddress().getPort() + "/";
-        return new DocumentosDotnetClient(new DotnetApiProperties(url, "api/v1", 5), tokenService);
+        return new DocumentosDotnetClient(new DotnetApiProperties(url, "api", 5), tokenService);
     }
 
     private Jwt tokenRecebido() {
@@ -92,7 +92,7 @@ class DocumentosDotnetClientTest {
         ArquivoBaixado arquivo = cliente().baixarArquivo(DOCUMENTO);
 
         assertThat(metodo.get()).isEqualTo("GET");
-        assertThat(caminho.get()).isEqualTo("/api/v1/documentos/" + DOCUMENTO + "/arquivo");
+        assertThat(caminho.get()).isEqualTo("/api/documentos/" + DOCUMENTO + "/arquivo");
         assertThat(tokenRecebido().getClaimAsString("role")).isEqualTo("SERVICO");
         assertThat(new String(arquivo.conteudo(), StandardCharsets.UTF_8)).isEqualTo("%PDF-laudo");
         assertThat(arquivo.tipoMidia()).isEqualTo("application/pdf");
@@ -105,7 +105,7 @@ class DocumentosDotnetClientTest {
         cliente().baixarArquivoComoUsuario(DOCUMENTO, "token-da-ana");
 
         assertThat(autorizacao.get()).isEqualTo("Bearer token-da-ana");
-        assertThat(caminho.get()).isEqualTo("/api/v1/documentos/" + DOCUMENTO + "/arquivo");
+        assertThat(caminho.get()).isEqualTo("/api/documentos/" + DOCUMENTO + "/arquivo");
     }
 
     @Test
@@ -123,7 +123,7 @@ class DocumentosDotnetClientTest {
 
         assertThat(informado).isTrue();
         assertThat(metodo.get()).isEqualTo("PATCH");
-        assertThat(caminho.get()).isEqualTo("/api/v1/documentos/" + DOCUMENTO + "/status");
+        assertThat(caminho.get()).isEqualTo("/api/documentos/" + DOCUMENTO + "/status");
         assertThat(corpo.get()).isEqualTo("{\"status\":\"EXTRAIDO\"}");
         assertThat(tokenRecebido().getClaimAsString("role")).isEqualTo("SERVICO");
     }

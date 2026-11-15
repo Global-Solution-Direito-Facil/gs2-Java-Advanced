@@ -149,7 +149,7 @@ class ProcessamentoDocumentoServiceTest {
     }
 
     @Test
-    void arquivoIndisponivelNaoGravaNada() {
+    void arquivoIndisponivelNaoGravaNadaEAvisaFalhaNaDotnet() {
         when(documentoRepository.findByIdExterno(DOCUMENTO)).thenReturn(Optional.empty());
         when(pessoaRepository.existsByIdAndUsuarioEmailIgnoreCase(2L, EMAIL)).thenReturn(true);
         when(dotnetClient.baixarArquivo(DOCUMENTO)).thenThrow(new ResponseStatusException(HttpStatus.BAD_GATEWAY, "fora"));
@@ -157,6 +157,7 @@ class ProcessamentoDocumentoServiceTest {
         assertThat(service.processar(evento("LAUDO", 2L))).isEqualTo(Resultado.ARQUIVO_INDISPONIVEL);
 
         verify(documentoRepository, never()).saveAndFlush(any());
+        verify(dotnetClient).informarStatus(DOCUMENTO, StatusDocumentoDotnet.FALHA);
         verifyNoInteractions(iaLaudoService, laudoService);
     }
 
