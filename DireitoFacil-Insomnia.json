@@ -10,7 +10,7 @@
       "modified": 1794400000000,
       "created": 1794400000000,
       "name": "Direito Fácil API - Java",
-      "description": "Coleção da API Java do Direito Fácil. Rode 00 - Auth e cole os tokens no Base Environment (valem 60 minutos). As pastas seguem a ordem da demonstração.",
+      "description": "Coleção da API Java do Direito Fácil. Rode 00 - Auth e cole os tokens no Base Environment (valem 8 horas). As pastas seguem a ordem da demonstração.",
       "scope": "collection",
       "_type": "workspace"
     },
@@ -33,12 +33,30 @@
         "caso_concedido_id": 4,
         "direito_teste_id": 21,
         "documento_demo_id": 6,
-        "receita_id": 1
+        "receita_id": 1,
+        "laudo_id": 1,
+        "usuario_ana_id": 1,
+        "documento_ia_id": "dotnet-doc-0001"
       },
       "dataPropertyOrder": null,
       "color": null,
       "isPrivate": false,
       "metaSortKey": 1,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_direitofacil0000000000002",
+      "parentId": "env_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "Render (publicado)",
+      "data": {
+        "base_url": "https://direitofacil-java.onrender.com"
+      },
+      "dataPropertyOrder": null,
+      "color": "#7d69cb",
+      "isPrivate": false,
+      "metaSortKey": 2,
       "_type": "environment"
     },
     {
@@ -455,6 +473,66 @@
       "modified": 1794400000000,
       "created": 1794400000000,
       "url": "{{ _.base_url }}/api/v1/direitos/{{ _.direito_teste_id }}",
+      "name": "Buscar direito por id",
+      "description": "Esperado: 200. Direito criado acima, com o critério aninhado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 130,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000015",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/direitos/{{ _.direito_teste_id }}",
+      "name": "Atualizar direito - gestor",
+      "description": "Esperado: 200. Só GESTOR. Altera o direito e o critério.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"codigo\": \"DIREITO_TESTE_DEMO\",\n  \"nome\": \"Direito de teste atualizado\",\n  \"orgao\": \"Orgao de teste\",\n  \"baseLegal\": \"Lei de teste\",\n  \"grupoAlvo\": \"IDOSO\",\n  \"prazoDias\": 45,\n  \"statusVerificacao\": \"CONFIRMAR\",\n  \"criterio\": {\n    \"idadeMin\": 60,\n    \"idadeMax\": null,\n    \"exigePcd\": false,\n    \"exigeTea\": false,\n    \"fracaoSmMax\": null,\n    \"pctTolerancia\": 0,\n    \"tipoExigido\": null,\n    \"rendaIndividual\": false\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 140,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000016",
+      "parentId": "fld_direitofacil0000000000002",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/direitos/{{ _.direito_teste_id }}",
       "name": "Excluir direito de teste - gestor",
       "description": "Esperado: 204. Só GESTOR. Remove o direito criado acima.",
       "method": "DELETE",
@@ -465,7 +543,7 @@
         "type": "bearer",
         "token": "{{ _.token_gestor }}"
       },
-      "metaSortKey": 130,
+      "metaSortKey": 150,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -488,65 +566,13 @@
       "_type": "request_group"
     },
     {
-      "_id": "req_direitofacil0000000000015",
+      "_id": "req_direitofacil0000000000017",
       "parentId": "fld_direitofacil0000000000003",
       "modified": 1794400000000,
       "created": 1794400000000,
       "url": "{{ _.base_url }}/api/v1/pessoas",
       "name": "Meus beneficiários (cidadão)",
       "description": "Esperado: 200. Cidadão vê só os próprios beneficiários (Ana: Lucas).",
-      "method": "GET",
-      "body": {},
-      "parameters": [],
-      "headers": [],
-      "authentication": {
-        "type": "bearer",
-        "token": "{{ _.token_cidadao }}"
-      },
-      "metaSortKey": 140,
-      "isPrivate": false,
-      "settingStoreCookies": true,
-      "settingSendCookies": true,
-      "settingDisableRenderRequestBody": false,
-      "settingEncodeUrl": true,
-      "settingRebuildPath": true,
-      "settingFollowRedirects": "global",
-      "_type": "request"
-    },
-    {
-      "_id": "req_direitofacil0000000000016",
-      "parentId": "fld_direitofacil0000000000003",
-      "modified": 1794400000000,
-      "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/pessoas?nome=a",
-      "name": "Todas as pessoas (gestor)",
-      "description": "Esperado: 200. Gestor vê todas e pode filtrar por nome.",
-      "method": "GET",
-      "body": {},
-      "parameters": [],
-      "headers": [],
-      "authentication": {
-        "type": "bearer",
-        "token": "{{ _.token_gestor }}"
-      },
-      "metaSortKey": 150,
-      "isPrivate": false,
-      "settingStoreCookies": true,
-      "settingSendCookies": true,
-      "settingDisableRenderRequestBody": false,
-      "settingEncodeUrl": true,
-      "settingRebuildPath": true,
-      "settingFollowRedirects": "global",
-      "_type": "request"
-    },
-    {
-      "_id": "req_direitofacil0000000000017",
-      "parentId": "fld_direitofacil0000000000003",
-      "modified": 1794400000000,
-      "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.pessoa_lucas_id }}",
-      "name": "Buscar pessoa (Lucas)",
-      "description": "Esperado: 200. Idade e renda per capita calculadas.",
       "method": "GET",
       "body": {},
       "parameters": [],
@@ -570,24 +596,16 @@
       "parentId": "fld_direitofacil0000000000003",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/pessoas",
-      "name": "Cadastrar pessoa idosa (abre casos e publica eventos)",
-      "description": "Esperado: 201. A regra PL/SQL abre os casos ELEGIVEL/POSSIVEL e o Java publica DireitoIdentificado no RabbitMQ. Copie o id para nova_pessoa_id.",
-      "method": "POST",
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"nome\": \"Dona Maria Demonstracao\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": 700\n}"
-      },
+      "url": "{{ _.base_url }}/api/v1/pessoas?nome=a",
+      "name": "Todas as pessoas (gestor)",
+      "description": "Esperado: 200. Gestor vê todas e pode filtrar por nome.",
+      "method": "GET",
+      "body": {},
       "parameters": [],
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
+      "headers": [],
       "authentication": {
         "type": "bearer",
-        "token": "{{ _.token_cidadao }}"
+        "token": "{{ _.token_gestor }}"
       },
       "metaSortKey": 170,
       "isPrivate": false,
@@ -604,21 +622,13 @@
       "parentId": "fld_direitofacil0000000000003",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.nova_pessoa_id }}",
-      "name": "Atualizar renda individual para 'não sei' (reavaliação)",
-      "description": "Esperado: 200. rendaIndividual nula = 'não sei'. O passe do idoso vira POSSIVEL com o motivo 'Informe a renda individual' (PRC_REAVALIAR_CASOS).",
-      "method": "PUT",
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"nome\": \"Dona Maria Demonstracao\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": null\n}"
-      },
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.pessoa_lucas_id }}",
+      "name": "Buscar pessoa (Lucas)",
+      "description": "Esperado: 200. Idade e renda per capita calculadas.",
+      "method": "GET",
+      "body": {},
       "parameters": [],
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
+      "headers": [],
       "authentication": {
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
@@ -638,13 +648,21 @@
       "parentId": "fld_direitofacil0000000000003",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.nova_pessoa_id }}/elegibilidade",
-      "name": "Avaliar todo o catálogo (sem gravar)",
-      "description": "Esperado: 200. Resultado e motivo de cada direito, inclusive os NAO_ELEGIVEL.",
-      "method": "GET",
-      "body": {},
+      "url": "{{ _.base_url }}/api/v1/pessoas",
+      "name": "Cadastrar pessoa idosa (abre casos e publica eventos)",
+      "description": "Esperado: 201. A regra PL/SQL abre os casos ELEGIVEL/POSSIVEL e o Java publica DireitoIdentificado no RabbitMQ. Copie o id para nova_pessoa_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Dona Maria Demonstracao\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": 700\n}"
+      },
       "parameters": [],
-      "headers": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "authentication": {
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
@@ -664,13 +682,13 @@
       "parentId": "fld_direitofacil0000000000003",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/pessoas",
-      "name": "Validação: renda individual maior que a familiar (400)",
-      "description": "Esperado: 400.",
-      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.nova_pessoa_id }}",
+      "name": "Atualizar renda individual para 'não sei' (reavaliação)",
+      "description": "Esperado: 200. rendaIndividual nula = 'não sei'. O passe do idoso vira POSSIVEL com o motivo 'Informe a renda individual' (PRC_REAVALIAR_CASOS).",
+      "method": "PUT",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"nome\": \"Teste\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": 900\n}"
+        "text": "{\n  \"nome\": \"Dona Maria Demonstracao\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": null\n}"
       },
       "parameters": [],
       "headers": [
@@ -698,10 +716,10 @@
       "parentId": "fld_direitofacil0000000000003",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.pessoa_lucas_id }}",
-      "name": "Excluir pessoa com caso em andamento (409)",
-      "description": "Esperado: 409. O Lucas tem casos que já saíram de ABERTO.",
-      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.nova_pessoa_id }}/elegibilidade",
+      "name": "Avaliar todo o catálogo (sem gravar)",
+      "description": "Esperado: 200. Resultado e motivo de cada direito, inclusive os NAO_ELEGIVEL.",
+      "method": "GET",
       "body": {},
       "parameters": [],
       "headers": [],
@@ -724,6 +742,66 @@
       "parentId": "fld_direitofacil0000000000003",
       "modified": 1794400000000,
       "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas",
+      "name": "Validação: renda individual maior que a familiar (400)",
+      "description": "Esperado: 400.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Teste\",\n  \"dataNascimento\": \"1950-05-05\",\n  \"rendaFamiliar\": 700,\n  \"qtdMembrosFamilia\": 2,\n  \"rendaIndividual\": 900\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 220,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000024",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.pessoa_lucas_id }}",
+      "name": "Excluir pessoa com caso em andamento (409)",
+      "description": "Esperado: 409. O Lucas tem casos que já saíram de ABERTO.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 230,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000025",
+      "parentId": "fld_direitofacil0000000000003",
+      "modified": 1794400000000,
+      "created": 1794400000000,
       "url": "{{ _.base_url }}/api/v1/pessoas/{{ _.nova_pessoa_id }}",
       "name": "Excluir pessoa nova",
       "description": "Esperado: 204. Remove a pessoa e os casos ABERTO; a auditoria do banco registra os DELETE.",
@@ -735,7 +813,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 220,
+      "metaSortKey": 240,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -758,13 +836,13 @@
       "_type": "request_group"
     },
     {
-      "_id": "req_direitofacil0000000000024",
+      "_id": "req_direitofacil0000000000026",
       "parentId": "fld_direitofacil0000000000004",
       "modified": 1794400000000,
       "created": 1794400000000,
       "url": "{{ _.base_url }}/api/v1/laudos",
       "name": "Registrar laudo (gestor) - deficiência física do Marcos",
-      "description": "Esperado: 201. Só GESTOR (ou a extração da IA). Reavalia a pessoa e abre os casos de PcD.",
+      "description": "Esperado: 201. Só GESTOR (ou a extração da IA). Reavalia a pessoa e abre os casos de PcD. Copie o id para laudo_id.",
       "method": "POST",
       "body": {
         "mimeType": "application/json",
@@ -781,7 +859,7 @@
         "type": "bearer",
         "token": "{{ _.token_gestor }}"
       },
-      "metaSortKey": 230,
+      "metaSortKey": 250,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -792,7 +870,33 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000025",
+      "_id": "req_direitofacil0000000000027",
+      "parentId": "fld_direitofacil0000000000004",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/laudos/{{ _.laudo_id }}",
+      "name": "Buscar laudo por id",
+      "description": "Esperado: 200. Laudo estruturado (dono ou gestor).",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 260,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000028",
       "parentId": "fld_direitofacil0000000000004",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -807,7 +911,7 @@
         "type": "bearer",
         "token": "{{ _.token_gestor }}"
       },
-      "metaSortKey": 240,
+      "metaSortKey": 270,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -830,91 +934,13 @@
       "_type": "request_group"
     },
     {
-      "_id": "req_direitofacil0000000000026",
+      "_id": "req_direitofacil0000000000029",
       "parentId": "fld_direitofacil0000000000005",
       "modified": 1794400000000,
       "created": 1794400000000,
       "url": "{{ _.base_url }}/api/v1/casos/me",
       "name": "Meus casos (cidadão)",
       "description": "Esperado: 200. Lista 'meus pedidos' do app.",
-      "method": "GET",
-      "body": {},
-      "parameters": [],
-      "headers": [],
-      "authentication": {
-        "type": "bearer",
-        "token": "{{ _.token_cidadao }}"
-      },
-      "metaSortKey": 250,
-      "isPrivate": false,
-      "settingStoreCookies": true,
-      "settingSendCookies": true,
-      "settingDisableRenderRequestBody": false,
-      "settingEncodeUrl": true,
-      "settingRebuildPath": true,
-      "settingFollowRedirects": "global",
-      "_type": "request"
-    },
-    {
-      "_id": "req_direitofacil0000000000027",
-      "parentId": "fld_direitofacil0000000000005",
-      "modified": 1794400000000,
-      "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/casos?resultado=POSSIVEL",
-      "name": "Casos POSSIVEL (gestor)",
-      "description": "Esperado: 200. Filtros por pessoa, status e resultado.",
-      "method": "GET",
-      "body": {},
-      "parameters": [],
-      "headers": [],
-      "authentication": {
-        "type": "bearer",
-        "token": "{{ _.token_gestor }}"
-      },
-      "metaSortKey": 260,
-      "isPrivate": false,
-      "settingStoreCookies": true,
-      "settingSendCookies": true,
-      "settingDisableRenderRequestBody": false,
-      "settingEncodeUrl": true,
-      "settingRebuildPath": true,
-      "settingFollowRedirects": "global",
-      "_type": "request"
-    },
-    {
-      "_id": "req_direitofacil0000000000028",
-      "parentId": "fld_direitofacil0000000000005",
-      "modified": 1794400000000,
-      "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/casos/1",
-      "name": "Detalhe do caso 1",
-      "description": "Esperado: 200. ",
-      "method": "GET",
-      "body": {},
-      "parameters": [],
-      "headers": [],
-      "authentication": {
-        "type": "bearer",
-        "token": "{{ _.token_cidadao }}"
-      },
-      "metaSortKey": 270,
-      "isPrivate": false,
-      "settingStoreCookies": true,
-      "settingSendCookies": true,
-      "settingDisableRenderRequestBody": false,
-      "settingEncodeUrl": true,
-      "settingRebuildPath": true,
-      "settingFollowRedirects": "global",
-      "_type": "request"
-    },
-    {
-      "_id": "req_direitofacil0000000000029",
-      "parentId": "fld_direitofacil0000000000005",
-      "modified": 1794400000000,
-      "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/casos/1/historico",
-      "name": "Histórico do caso 1 (auditoria)",
-      "description": "Esperado: 200. Lido da trilha gravada pelo gatilho TRG_DF_AUDITORIA_CASO.",
       "method": "GET",
       "body": {},
       "parameters": [],
@@ -938,21 +964,13 @@
       "parentId": "fld_direitofacil0000000000005",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/status",
-      "name": "Mudar status do caso (gestor)",
-      "description": "Esperado: 200. Passa pela PKG_CASOS; o gatilho valida o fluxo e grava a auditoria.",
-      "method": "PATCH",
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"status\": \"EM_ANALISE\"\n}"
-      },
+      "url": "{{ _.base_url }}/api/v1/casos?resultado=POSSIVEL",
+      "name": "Casos POSSIVEL (gestor)",
+      "description": "Esperado: 200. Filtros por pessoa, status e resultado.",
+      "method": "GET",
+      "body": {},
       "parameters": [],
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
+      "headers": [],
       "authentication": {
         "type": "bearer",
         "token": "{{ _.token_gestor }}"
@@ -972,24 +990,16 @@
       "parentId": "fld_direitofacil0000000000005",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_concedido_id }}/status",
-      "name": "Transição inválida - caso CONCEDIDO (409)",
-      "description": "Esperado: 409 com ORA-20032 vindo do gatilho.",
-      "method": "PATCH",
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"status\": \"ABERTO\"\n}"
-      },
+      "url": "{{ _.base_url }}/api/v1/casos/1",
+      "name": "Detalhe do caso 1",
+      "description": "Esperado: 200. ",
+      "method": "GET",
+      "body": {},
       "parameters": [],
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
+      "headers": [],
       "authentication": {
         "type": "bearer",
-        "token": "{{ _.token_gestor }}"
+        "token": "{{ _.token_cidadao }}"
       },
       "metaSortKey": 300,
       "isPrivate": false,
@@ -1006,21 +1016,13 @@
       "parentId": "fld_direitofacil0000000000005",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/status",
-      "name": "Cidadão tenta mudar status (403)",
-      "description": "Esperado: 403.",
-      "method": "PATCH",
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"status\": \"EM_ANALISE\"\n}"
-      },
+      "url": "{{ _.base_url }}/api/v1/casos/1/historico",
+      "name": "Histórico do caso 1 (auditoria)",
+      "description": "Esperado: 200. Lido da trilha gravada pelo gatilho TRG_DF_AUDITORIA_CASO.",
+      "method": "GET",
+      "body": {},
       "parameters": [],
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
+      "headers": [],
       "authentication": {
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
@@ -1040,13 +1042,13 @@
       "parentId": "fld_direitofacil0000000000005",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/orientacao",
-      "name": "Registrar orientação (gestor/RAG)",
-      "description": "Esperado: 200. Grava ou substitui o passo a passo com a fonte.",
-      "method": "PUT",
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/status",
+      "name": "Mudar status do caso (gestor)",
+      "description": "Esperado: 200. Passa pela PKG_CASOS; o gatilho valida o fluxo e grava a auditoria.",
+      "method": "PATCH",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"passoAPasso\": \"1. Reuna o laudo e o comprovante do CadUnico. 2. Solicite no site do Ministerio dos Transportes.\",\n  \"fonte\": \"Lei 8.899/1994\",\n  \"modelo\": \"demo\"\n}"
+        "text": "{\n  \"status\": \"EM_ANALISE\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -1074,16 +1076,24 @@
       "parentId": "fld_direitofacil0000000000005",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/orientacao",
-      "name": "Ver orientação do caso",
-      "description": "Esperado: 200. ",
-      "method": "GET",
-      "body": {},
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_concedido_id }}/status",
+      "name": "Transição inválida - caso CONCEDIDO (409)",
+      "description": "Esperado: 409 com ORA-20032 vindo do gatilho.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"ABERTO\"\n}"
+      },
       "parameters": [],
-      "headers": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "authentication": {
         "type": "bearer",
-        "token": "{{ _.token_cidadao }}"
+        "token": "{{ _.token_gestor }}"
       },
       "metaSortKey": 330,
       "isPrivate": false,
@@ -1096,29 +1106,17 @@
       "_type": "request"
     },
     {
-      "_id": "fld_direitofacil0000000000006",
-      "parentId": "wrk_direitofacil0000000000001",
-      "modified": 1794400000000,
-      "created": 1794400000000,
-      "name": "05 - Documentos",
-      "description": "",
-      "environment": {},
-      "environmentPropertyOrder": null,
-      "metaSortKey": 6000,
-      "_type": "request_group"
-    },
-    {
       "_id": "req_direitofacil0000000000035",
-      "parentId": "fld_direitofacil0000000000006",
+      "parentId": "fld_direitofacil0000000000005",
       "modified": 1794400000000,
       "created": 1794400000000,
-      "url": "{{ _.base_url }}/api/v1/documentos",
-      "name": "Registrar documento (metadados do arquivo da .NET)",
-      "description": "Esperado: 201. Copie o id para documento_demo_id.",
-      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/status",
+      "name": "Cidadão tenta mudar status (403)",
+      "description": "Esperado: 403.",
+      "method": "PATCH",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"pessoaId\": 1,\n  \"idExterno\": \"dotnet-doc-insomnia-1\",\n  \"nomeArquivo\": \"laudo_demo.pdf\",\n  \"tipoMidia\": \"application/pdf\",\n  \"tamanhoBytes\": 12345,\n  \"chaveIdempotencia\": \"insomnia-idem-1\"\n}"
+        "text": "{\n  \"status\": \"EM_ANALISE\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -1143,6 +1141,138 @@
     },
     {
       "_id": "req_direitofacil0000000000036",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/orientacao",
+      "name": "Registrar orientação (gestor/RAG)",
+      "description": "Esperado: 200. Grava ou substitui o passo a passo com a fonte.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"passoAPasso\": \"1. Reuna o laudo e o comprovante do CadUnico. 2. Solicite no site do Ministerio dos Transportes.\",\n  \"fonte\": \"Lei 8.899/1994\",\n  \"modelo\": \"demo\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 350,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000037",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/orientacao/gerar",
+      "name": "Gerar o passo a passo com IA (Spring AI + RAG)",
+      "description": "Esperado: 200/422/503. Parte do Alex. 200 com a GEMINI_API_KEY configurada; 503 se a IA estiver sem chave ou fora do ar; 422 se a base não tem orientação para o direito.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 360,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000038",
+      "parentId": "fld_direitofacil0000000000005",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/casos/{{ _.caso_id }}/orientacao",
+      "name": "Ver orientação do caso",
+      "description": "Esperado: 200. ",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 370,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_direitofacil0000000000006",
+      "parentId": "wrk_direitofacil0000000000001",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "name": "05 - Documentos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 6000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_direitofacil0000000000039",
+      "parentId": "fld_direitofacil0000000000006",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/documentos",
+      "name": "Registrar documento (metadados do arquivo da .NET)",
+      "description": "Esperado: 201. Copie o id para documento_demo_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pessoaId\": 1,\n  \"idExterno\": \"dotnet-doc-insomnia-1\",\n  \"nomeArquivo\": \"laudo_demo.pdf\",\n  \"tipoMidia\": \"application/pdf\",\n  \"tamanhoBytes\": 12345,\n  \"chaveIdempotencia\": \"insomnia-idem-1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 380,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000040",
       "parentId": "fld_direitofacil0000000000006",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1165,7 +1295,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 350,
+      "metaSortKey": 390,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1176,7 +1306,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000037",
+      "_id": "req_direitofacil0000000000041",
       "parentId": "fld_direitofacil0000000000006",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1191,7 +1321,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 360,
+      "metaSortKey": 400,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1202,7 +1332,33 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000038",
+      "_id": "req_direitofacil0000000000042",
+      "parentId": "fld_direitofacil0000000000006",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/documentos/{{ _.documento_demo_id }}",
+      "name": "Buscar documento por id",
+      "description": "Esperado: 200. Dono ou gestor.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 410,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000043",
       "parentId": "fld_direitofacil0000000000006",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1217,7 +1373,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 370,
+      "metaSortKey": 420,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1240,7 +1396,7 @@
       "_type": "request_group"
     },
     {
-      "_id": "req_direitofacil0000000000039",
+      "_id": "req_direitofacil0000000000044",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1255,7 +1411,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 380,
+      "metaSortKey": 430,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1266,7 +1422,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000040",
+      "_id": "req_direitofacil0000000000045",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1281,7 +1437,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 390,
+      "metaSortKey": 440,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1292,7 +1448,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000041",
+      "_id": "req_direitofacil0000000000046",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1307,7 +1463,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 400,
+      "metaSortKey": 450,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1318,7 +1474,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000042",
+      "_id": "req_direitofacil0000000000047",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1341,7 +1497,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao_helena }}"
       },
-      "metaSortKey": 410,
+      "metaSortKey": 460,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1352,7 +1508,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000043",
+      "_id": "req_direitofacil0000000000048",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1375,7 +1531,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao_helena }}"
       },
-      "metaSortKey": 420,
+      "metaSortKey": 470,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1386,7 +1542,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000044",
+      "_id": "req_direitofacil0000000000049",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1409,7 +1565,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao_helena }}"
       },
-      "metaSortKey": 430,
+      "metaSortKey": 480,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1420,7 +1576,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000045",
+      "_id": "req_direitofacil0000000000050",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1443,7 +1599,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao_helena }}"
       },
-      "metaSortKey": 440,
+      "metaSortKey": 490,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1454,7 +1610,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000046",
+      "_id": "req_direitofacil0000000000051",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1477,7 +1633,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao_helena }}"
       },
-      "metaSortKey": 450,
+      "metaSortKey": 500,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1488,7 +1644,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000047",
+      "_id": "req_direitofacil0000000000052",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1503,7 +1659,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao_helena }}"
       },
-      "metaSortKey": 460,
+      "metaSortKey": 510,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1514,7 +1670,41 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000048",
+      "_id": "req_direitofacil0000000000053",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas/extracao",
+      "name": "Ler a foto da receita com IA (extração)",
+      "description": "Esperado: 200/422/502/503. Parte do Alex. Baixa a foto na API .NET (documentoId = id do arquivo lá) e devolve os remédios lidos, sem gravar. Precisa de GEMINI_API_KEY e DOTNET_API_URL; sem elas, 502 ou 503.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"documentoId\": \"{{ _.documento_ia_id }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao_helena }}"
+      },
+      "metaSortKey": 520,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000054",
       "parentId": "fld_direitofacil0000000000007",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1529,7 +1719,33 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 470,
+      "metaSortKey": 530,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000055",
+      "parentId": "fld_direitofacil0000000000007",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/receitas/{{ _.receita_id }}",
+      "name": "Excluir a receita",
+      "description": "Esperado: 204. Remove a receita e os remédios; dono ou gestor.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao_helena }}"
+      },
+      "metaSortKey": 540,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1552,7 +1768,7 @@
       "_type": "request_group"
     },
     {
-      "_id": "req_direitofacil0000000000049",
+      "_id": "req_direitofacil0000000000056",
       "parentId": "fld_direitofacil0000000000008",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1567,7 +1783,7 @@
         "type": "bearer",
         "token": "{{ _.token_gestor }}"
       },
-      "metaSortKey": 480,
+      "metaSortKey": 550,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1578,7 +1794,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000050",
+      "_id": "req_direitofacil0000000000057",
       "parentId": "fld_direitofacil0000000000008",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1593,7 +1809,7 @@
         "type": "bearer",
         "token": "{{ _.token_gestor }}"
       },
-      "metaSortKey": 490,
+      "metaSortKey": 560,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1604,7 +1820,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000051",
+      "_id": "req_direitofacil0000000000058",
       "parentId": "fld_direitofacil0000000000008",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1619,7 +1835,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 500,
+      "metaSortKey": 570,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1642,7 +1858,7 @@
       "_type": "request_group"
     },
     {
-      "_id": "req_direitofacil0000000000052",
+      "_id": "req_direitofacil0000000000059",
       "parentId": "fld_direitofacil0000000000009",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1654,7 +1870,7 @@
       "parameters": [],
       "headers": [],
       "authentication": {},
-      "metaSortKey": 510,
+      "metaSortKey": 580,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1665,7 +1881,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000053",
+      "_id": "req_direitofacil0000000000060",
       "parentId": "fld_direitofacil0000000000009",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1680,7 +1896,7 @@
         "type": "bearer",
         "token": "token.invalido.demo"
       },
-      "metaSortKey": 520,
+      "metaSortKey": 590,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1691,7 +1907,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000054",
+      "_id": "req_direitofacil0000000000061",
       "parentId": "fld_direitofacil0000000000009",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1706,7 +1922,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 530,
+      "metaSortKey": 600,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1717,7 +1933,30 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000055",
+      "_id": "req_direitofacil0000000000062",
+      "parentId": "fld_direitofacil0000000000009",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/keepalive",
+      "name": "Keep Alive (público)",
+      "description": "Esperado: 200. Rota pública que mantém a API acordada no Render e serve de verificação de saúde; não consulta o banco.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 610,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000063",
       "parentId": "fld_direitofacil0000000000009",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1729,7 +1968,7 @@
       "parameters": [],
       "headers": [],
       "authentication": {},
-      "metaSortKey": 540,
+      "metaSortKey": 620,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1752,7 +1991,127 @@
       "_type": "request_group"
     },
     {
-      "_id": "req_direitofacil0000000000056",
+      "_id": "req_direitofacil0000000000064",
+      "parentId": "fld_direitofacil0000000000010",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/usuarios/{{ _.usuario_ana_id }}",
+      "name": "Buscar usuário por id (a própria conta)",
+      "description": "Esperado: 200. Cidadão só acessa a própria conta; gestor acessa qualquer uma.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 630,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000065",
+      "parentId": "fld_direitofacil0000000000010",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/usuarios/{{ _.usuario_ana_id }}",
+      "name": "Atualizar o próprio nome",
+      "description": "Esperado: 200. Só o nome muda; CPF, e-mail e senha não.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Ana Almeida\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_cidadao }}"
+      },
+      "metaSortKey": 640,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000066",
+      "parentId": "fld_direitofacil0000000000010",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/gestores",
+      "name": "Listar gestores (gestor)",
+      "description": "Esperado: 200. Equipe de assistentes sociais.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 650,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000067",
+      "parentId": "fld_direitofacil0000000000010",
+      "modified": 1794400000000,
+      "created": 1794400000000,
+      "url": "{{ _.base_url }}/api/v1/gestores",
+      "name": "Criar outro gestor (gestor)",
+      "description": "Esperado: 201/409. Só GESTOR cria gestor. 201 na primeira vez; 409 se o e-mail ou CPF já existe.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Gestor Demonstracao\",\n  \"cpf\": \"390.533.447-05\",\n  \"email\": \"gestor.demo@cras.gov.br\",\n  \"senha\": \"SenhaForte1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 660,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_direitofacil0000000000068",
       "parentId": "fld_direitofacil0000000000010",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1775,7 +2134,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 550,
+      "metaSortKey": 670,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
@@ -1786,7 +2145,7 @@
       "_type": "request"
     },
     {
-      "_id": "req_direitofacil0000000000057",
+      "_id": "req_direitofacil0000000000069",
       "parentId": "fld_direitofacil0000000000010",
       "modified": 1794400000000,
       "created": 1794400000000,
@@ -1809,7 +2168,7 @@
         "type": "bearer",
         "token": "{{ _.token_cidadao }}"
       },
-      "metaSortKey": 560,
+      "metaSortKey": 680,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,

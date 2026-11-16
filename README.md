@@ -12,7 +12,19 @@ O backend foi desenvolvido com **Java, Spring Boot, Oracle Database, Flyway, Spr
 
 # 🌐 API publicada
 
-- **Deploy:** _link a adicionar, se houver._ Enquanto isso, a API roda localmente seguindo a seção "Como executar".
+A API está publicada no Render:
+
+```text
+https://direitofacil-java.onrender.com
+```
+
+- **Swagger:** https://direitofacil-java.onrender.com/swagger-ui/index.html
+- **OpenAPI:** https://direitofacil-java.onrender.com/v3/api-docs
+- **Keep Alive (verificação de saúde, sem token):** https://direitofacil-java.onrender.com/keepalive
+
+Os usuários de demonstração e a senha são os mesmos da seção "Usuários de demonstração". Faça o login em `POST /api/v1/auth/login` e use o botão **Authorize** do Swagger.
+
+> **Aviso:** o deploy usa o plano gratuito do Render, então a primeira requisição depois de um tempo parado pode demorar cerca de um minuto. A própria API chama a rota `/keepalive` a cada minuto para evitar que hiberne. Também dá para rodar localmente, seguindo a seção "Como executar".
 
 ---
 
@@ -651,10 +663,10 @@ Os erros `ORA-200xx` vêm dos pacotes e gatilhos PL/SQL. A mensagem do banco vai
 
 # 🧪 Testando a API com Insomnia
 
-O repositório tem a coleção `DireitoFacil-Insomnia.json`, com 57 requisições em 10 pastas, na ordem da demonstração.
+O repositório tem a coleção `DireitoFacil-Insomnia.json`, com 69 requisições em 10 pastas, na ordem da demonstração. As duas de IA (passo a passo e leitura da receita) dependem da `GEMINI_API_KEY` e da API .NET: sem elas devolvem 503 ou 502, e a descrição de cada uma diz o status aceito.
 
 1. No Insomnia: `Import → File → DireitoFacil-Insomnia.json`.
-2. No `Base Environment`, confira `base_url` (`http://localhost:8080`).
+2. A coleção tem dois ambientes: o `Base Environment`, com `base_url` em `http://localhost:8080`, e o sub-ambiente **Render (publicado)**, com `base_url` em `https://direitofacil-java.onrender.com`. Escolha o ambiente no seletor do Insomnia (canto superior esquerdo) para testar a API local ou a publicada, sem mudar mais nada.
 3. Rode `00 - Auth` e copie os tokens para `token_gestor`, `token_cidadao` (Ana) e `token_cidadao_helena` (Paula). Eles valem 8 horas.
 4. Nas requisições que criam algo (direito de teste, pessoa nova, documento, receita), copie o `id` devolvido para a variável indicada na descrição.
 
