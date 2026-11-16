@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/registrar").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/error", "/keepalive").permitAll()
                         // papel conferido aqui, antes da validação do corpo (os controllers repetem com @PreAuthorize)
                         .requestMatchers("/api/v1/gestores/**", "/api/v1/painel/**").hasAuthority("GESTOR")
                         .requestMatchers(HttpMethod.POST, "/api/v1/direitos", "/api/v1/laudos").hasAuthority("GESTOR")

@@ -1,0 +1,7 @@
+.git
+.idea
+target
+*.iml
+docker-compose.yml
+DireitoFacil-Insomnia.json
+README.md
