@@ -8,7 +8,8 @@ O backend foi desenvolvido com **Java, Spring Boot, Oracle Database, Flyway, Spr
 
 # 📹 Demonstração
 
-- **Vídeo pitch (até 5 minutos):** _link a adicionar_
+- **Vídeo pitch (até 5 minutos):** https://youtu.be/NDxbd-dklfA
+- **Vídeo de apresentação:** https://youtu.be/N8qQvDUSsds
 
 # 🌐 API publicada
 
